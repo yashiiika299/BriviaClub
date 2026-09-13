@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/profile.html", "destination": "/app.html?view=profile" },
+    { "source": "/explore.html", "destination": "/app.html?view=explore" },
+    { "source": "/chat.html", "destination": "/app.html?view=chat" }
+  ]
+}

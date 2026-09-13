@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f1e9" />
+    <meta name="description" content="Join the Brivia Club community." />
+    <title>Join the Brivia Club</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,500;0,600;0,700;1,700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="auth-page auth-open">
+    <div class="auth-modal is-open" id="auth-modal">
+      <div class="auth-backdrop" data-auth-close></div>
+      <section class="auth-shell" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <button class="auth-close" type="button" aria-label="Go back to Brivia Club">×</button>
+        <div class="auth-visual">
+          <div class="auth-visual-top"><span>THE BRIVIA CLUB</span><span>MEMBERSHIP / 001</span></div>
+          <div class="auth-visual-copy"><p>THE RIGHT CONNECTION</p><h2>FIND<br />YOUR<br /><em>KIND.</em></h2><span>PRIVATE PEOPLE.<br />OPEN POSSIBILITIES.</span></div>
+          <div class="auth-constellation" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+          <div class="auth-visual-bottom"><span>BRIVIA / 2026</span><span>SWIPE WITH INTENT</span></div>
+        </div>
+        <div class="auth-panel">
+          <span class="auth-scrollbar" aria-hidden="true"><span></span></span>
+          <div class="auth-panel-top"><span class="auth-panel-kicker">WELCOME IN</span><span class="auth-step">01 / 02</span></div>
+          <div class="auth-view auth-login is-active" data-auth-view="login">
+            <p class="auth-eyebrow">MEMBER ACCESS</p>
+            <h1 id="auth-title">Enter the club.</h1>
+            <p class="auth-intro">A quieter way to meet people who are going somewhere.</p>
+            <form class="auth-form" id="login-form">
+              <label>Email address<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required /></label>
+              <label>Password<input type="password" name="password" autocomplete="current-password" placeholder="••••••••" required /></label>
+              <button class="auth-submit" type="submit">CONTINUE <span>→</span></button>
+            </form>
+            <p class="auth-note" id="login-note" aria-live="polite"></p>
+            <div class="auth-divider"><span>OR</span></div>
+            <button class="auth-secondary auth-create-trigger" type="button">CREATE AN ACCOUNT <span>↗</span></button>
+          </div>
+
+          <div class="auth-view auth-signup" data-auth-view="signup" hidden>
+            <p class="auth-eyebrow">YOUR INTRODUCTION</p>
+            <h1 id="signup-title">Make your profile.</h1>
+            <p class="auth-intro">Tell us enough to make your next introduction feel natural.</p>
+            <form class="auth-form auth-signup-form" id="signup-form">
+              <div class="auth-field-grid">
+                <label>Full name<input type="text" name="name" autocomplete="name" placeholder="Your name" required /></label>
+                <label>Email address<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required /></label>
+                <label>Phone number<input type="tel" name="phone" autocomplete="tel" placeholder="+91 98765 43210" required /></label>
+                <label>City<input type="text" name="city" autocomplete="address-level2" placeholder="Bengaluru" required /></label>
+                <label>State<input type="text" name="state" autocomplete="address-level1" placeholder="Karnataka" required /></label>
+                <label>Experience<select name="experience" required><option value="" disabled selected>Choose one</option><option>Student / just starting</option><option>1–3 years</option><option>3–7 years</option><option>7–12 years</option><option>12+ years</option></select></label>
+              </div>
+              <div class="photo-upload" data-photo-upload>
+                <label for="profile-photo">Profile photo</label>
+                <input class="photo-input" id="profile-photo" type="file" accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.svg,.avif,.heic,.heif,.bmp,.tif,.tiff" aria-label="Upload profile photo" />
+                <label class="photo-drop" for="profile-photo"><span class="photo-preview" aria-hidden="true">＋</span><span class="photo-copy"><strong>ADD A PROFILE PHOTO</strong><small class="photo-file-name">Optional · A clear photo helps people recognise you.</small></span><b>↗</b></label>
+                <button class="photo-remove" type="button" aria-label="Remove profile photo" hidden>REMOVE PHOTO <span>×</span></button>
+              </div>
+              <div class="skills-picker" data-skills-picker>
+                <label for="skills-search">Skills / interests</label>
+                <input class="skills-search" id="skills-search" type="search" placeholder="Search and select skills..." autocomplete="off" role="combobox" aria-controls="skills-results" aria-expanded="false" aria-label="Search skills" />
+                <input class="skills-other-input" type="text" placeholder="Write your own skill and press Enter..." autocomplete="off" aria-label="Write your own skill" hidden />
+                <div class="skills-results" id="skills-results" role="listbox" aria-label="Available skills"></div>
+                <div class="skills-selected" aria-live="polite"></div>
+                <input class="skills-value" type="hidden" name="skills" aria-required="true" />
+                <p class="skills-helper">Choose one or more · Select Other to write your own.</p>
+              </div>
+              <div class="looking-picker" data-looking-picker>
+                <label for="looking-search">What are you looking for?</label>
+                <input class="looking-search" id="looking-search" type="search" placeholder="Search what brings you here..." autocomplete="off" role="combobox" aria-controls="looking-results" aria-expanded="false" aria-label="Search what you are looking for" />
+                <input class="looking-other-input" type="text" placeholder="Write your own option and press Enter..." autocomplete="off" aria-label="Write your own option" hidden />
+                <div class="looking-results" id="looking-results" role="listbox" aria-label="What people are looking for"></div>
+                <div class="looking-selected" aria-live="polite"></div>
+                <input class="looking-value" type="hidden" name="lookingFor" aria-required="true" />
+                <p class="looking-helper">Choose one or more · Select Other to write your own.</p>
+              </div>
+              <button class="auth-submit" type="submit">CREATE MY PROFILE <span>→</span></button>
+            </form>
+            <div class="auth-success" id="auth-success" hidden><span class="auth-success-mark">✓</span><h2>You're on the list.</h2><p>Your email is your login ID. Save this unique password now—it won't be shown again.</p><div class="credential-list"><div class="credential-row"><span>EMAIL ID</span><code data-credential="account-email">you@example.com</code><button type="button" data-copy-credential="account-email">COPY</button></div><div class="credential-row"><span>PASSWORD</span><code data-credential="member-password">••••••••••••</code><button type="button" data-copy-credential="member-password">COPY</button></div></div><button class="auth-secondary auth-close-success" type="button">BACK TO BRIVIA <span>↗</span></button></div>
+            <button class="auth-back-trigger" type="button">← BACK TO LOGIN</button>
+          </div>
+        </div>
+      </section>
+    </div>
+    <section class="community-preview" aria-labelledby="community-preview-title">
+      <div class="community-preview-heading"><div><p class="auth-eyebrow">A FEW PEOPLE IN THE ROOM</p><h2 id="community-preview-title">YOUR KIND<br /><em>IS ALREADY HERE.</em></h2></div><span>SWIPE / DISCOVER / CONNECT</span></div>
+      <div class="community-marquee" aria-label="Placeholder member profiles">
+        <div class="community-track">
+          <article class="community-card"><div class="member-placeholder member-placeholder--violet">P</div><div><strong>PRIYA</strong><span>PRODUCT / BENGALURU</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--orange">A</div><div><strong>ARJUN</strong><span>BUILDER / DELHI</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--mint">M</div><div><strong>MEERA</strong><span>RESEARCH / MUMBAI</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--pink">R</div><div><strong>ROHAN</strong><span>FOUNDER / HYDERABAD</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--blue">N</div><div><strong>NEHA</strong><span>DESIGN / PUNE</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--yellow">K</div><div><strong>KABIR</strong><span>AI / CHENNAI</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--violet">P</div><div><strong>PRIYA</strong><span>PRODUCT / BENGALURU</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--orange">A</div><div><strong>ARJUN</strong><span>BUILDER / DELHI</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--mint">M</div><div><strong>MEERA</strong><span>RESEARCH / MUMBAI</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--pink">R</div><div><strong>ROHAN</strong><span>FOUNDER / HYDERABAD</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--blue">N</div><div><strong>NEHA</strong><span>DESIGN / PUNE</span></div><b>↗</b></article>
+          <article class="community-card"><div class="member-placeholder member-placeholder--yellow">K</div><div><strong>KABIR</strong><span>AI / CHENNAI</span></div><b>↗</b></article>
+        </div>
+      </div>
+      <p class="community-preview-note">Placeholder profiles for now · Real member discovery coming next.</p>
+    </section>
+    <script type="module" src="/script.js"></script>
+  </body>
+</html>

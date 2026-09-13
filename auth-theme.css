@@ -1,0 +1,24 @@
+/* Auth theme aligned with the cream member area. */
+.auth-page{background:#f5f1e9;color:#291d1b}
+.auth-page .auth-modal{background:#f5f1e9}
+.auth-visual{background:radial-gradient(circle at 70% 42%,rgba(180,93,119,.42),transparent 22%),radial-gradient(circle at 20% 90%,rgba(116,31,57,.5),transparent 30%),#351722}
+.auth-visual-copy p,.auth-visual-copy h2 em{color:#e8b7c3}
+.auth-constellation:before,.auth-constellation:after{background:linear-gradient(90deg,rgba(232,183,195,.72),transparent)}
+.auth-constellation i,.auth-constellation b{background:#e8b7c3;box-shadow:0 0 22px rgba(232,183,195,.8)}
+.auth-constellation b{background:#fff;box-shadow:0 0 35px 8px rgba(232,183,195,.7)}
+.auth-panel{background:#f5f1e9;color:#291d1b}
+.auth-scrollbar span{background:#741f39;box-shadow:0 0 0 1px rgba(116,31,57,.08)}
+.auth-step,.auth-eyebrow,.auth-note{color:#741f39}
+.auth-form input:focus,.auth-form select:focus{border-color:#9a4260;box-shadow:0 0 0 3px rgba(116,31,57,.13)}
+.auth-submit:hover{background:#741f39;border-color:#741f39}
+.auth-back-trigger:hover{color:#741f39}
+.auth-success-mark{color:#e8b7c3}
+.auth-panel{scrollbar-color:#741f39 #e8e1d8}
+.auth-panel::-webkit-scrollbar-thumb{background:#741f39;border-color:#e8e1d8}.auth-panel::-webkit-scrollbar-thumb:hover{background:#5c182d}
+.community-preview{background:#351722}.community-preview-heading h2 em{color:#e8b7c3}.community-card>b{color:#e8b7c3}
+
+/* Landing intro animation uses the same wine/burgundy identity. */
+.intro-burst{background:#351722}
+.intro-burst:after{background:radial-gradient(circle at 50% 50%,rgba(180,93,119,.24),transparent 34%)}
+.burst-core{background:#e8b7c3;box-shadow:0 0 50px 12px rgba(180,93,119,.62)}
+.burst-line{background:linear-gradient(90deg,rgba(255,225,231,.82),rgba(190,96,120,0))}
