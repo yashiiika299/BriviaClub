@@ -81,6 +81,96 @@ if (flowerHug && flowerSection && 'IntersectionObserver' in window) {
 
 const principleItems = document.querySelectorAll('.principle');
 const principleImages = document.querySelectorAll('.principle-image');
+const principleNodes = document.querySelectorAll('[data-principle-node]');
+const principlePhotos = document.querySelectorAll('[data-principle-photo]');
+const principlesConstellation = document.querySelector('[data-principles-constellation]');
+const photoFlightDeck = document.querySelector('[data-photo-flight-deck]');
+const principlesVisual = document.querySelector('.principles-visual');
+const principlesSection = document.querySelector('.principles-section');
+const matchingHeroWord = document.querySelector('.matching-hero-word');
+let matchingPointerFrame;
+let matchingPointerEvent;
+let swipeResetTimer;
+const triggerMatchingSwipe = (direction) => {
+  if (!photoFlightDeck && !matchingHeroWord) return;
+  const swipeX = direction === 'left' ? 1 : -1;
+  [photoFlightDeck, matchingHeroWord].forEach((element) => {
+    if (!element) return;
+    element.style.setProperty('--swipe-x', swipeX);
+    element.classList.remove('is-swiping');
+    void element.offsetWidth;
+    element.classList.add('is-swiping');
+  });
+  window.clearTimeout(swipeResetTimer);
+  swipeResetTimer = window.setTimeout(() => {
+    photoFlightDeck?.classList.remove('is-swiping');
+    matchingHeroWord?.classList.remove('is-swiping');
+  }, 1120);
+};
+principlesSection?.addEventListener('wheel', (event) => {
+  if (Math.abs(event.deltaX) < 12 || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+  triggerMatchingSwipe(event.deltaX > 0 ? 'left' : 'right');
+}, { passive: true });
+let matchingTouchStartX;
+principlesSection?.addEventListener('pointerdown', (event) => {
+  if (event.pointerType === 'touch') matchingTouchStartX = event.clientX;
+});
+principlesSection?.addEventListener('pointerup', (event) => {
+  if (event.pointerType !== 'touch' || matchingTouchStartX === undefined) return;
+  const distance = event.clientX - matchingTouchStartX;
+  if (Math.abs(distance) > 42) triggerMatchingSwipe(distance < 0 ? 'left' : 'right');
+  matchingTouchStartX = undefined;
+});
+principlesSection?.addEventListener('pointercancel', () => { matchingTouchStartX = undefined; });
+let matchingSceneFrame;
+const updateMatchingScene = () => {
+  if (!principlesSection || !principlesSection.classList.contains('is-visible')) return;
+  const bounds = principlesSection.getBoundingClientRect();
+  const travel = Math.max(bounds.height - window.innerHeight, 1);
+  const progress = Math.max(0, Math.min(1, -bounds.top / travel));
+  const drift = (progress - .5) * 90;
+  const wordDrift = (progress - .5) * -54;
+  principlesConstellation?.style.setProperty('--scroll-drift', `${drift * .36}px`);
+  photoFlightDeck?.style.setProperty('--scroll-drift', `${drift}px`);
+  matchingHeroWord?.style.setProperty('--word-drift', `${wordDrift}px`);
+};
+const requestMatchingSceneUpdate = () => {
+  if (matchingSceneFrame) return;
+  matchingSceneFrame = window.requestAnimationFrame(() => {
+    matchingSceneFrame = undefined;
+    updateMatchingScene();
+  });
+};
+window.addEventListener('scroll', requestMatchingSceneUpdate, { passive: true });
+window.addEventListener('resize', requestMatchingSceneUpdate);
+requestMatchingSceneUpdate();
+if (principlesSection && 'IntersectionObserver' in window) {
+  const principlesRevealObserver = new IntersectionObserver(([entry]) => {
+    principlesSection.classList.toggle('is-visible', entry.isIntersecting);
+  }, { threshold: 0.12 });
+  principlesRevealObserver.observe(principlesSection);
+}
+principlesVisual?.addEventListener('pointermove', (event) => {
+  matchingPointerEvent = event;
+  if (matchingPointerFrame) return;
+  matchingPointerFrame = window.requestAnimationFrame(() => {
+    matchingPointerFrame = undefined;
+    if (!matchingPointerEvent) return;
+    const bounds = principlesVisual.getBoundingClientRect();
+    const x = ((matchingPointerEvent.clientX - bounds.left) / bounds.width - .5) * 18;
+    const y = ((matchingPointerEvent.clientY - bounds.top) / bounds.height - .5) * 18;
+    principlesConstellation?.style.setProperty('--pointer-x', `${x}px`);
+    principlesConstellation?.style.setProperty('--pointer-y', `${y}px`);
+    photoFlightDeck?.style.setProperty('--pointer-x', `${x}px`);
+    photoFlightDeck?.style.setProperty('--pointer-y', `${y}px`);
+  });
+});
+principlesVisual?.addEventListener('pointerleave', () => {
+  principlesConstellation?.style.setProperty('--pointer-x', '0px');
+  principlesConstellation?.style.setProperty('--pointer-y', '0px');
+  photoFlightDeck?.style.setProperty('--pointer-x', '0px');
+  photoFlightDeck?.style.setProperty('--pointer-y', '0px');
+});
 if (principleItems.length && principleImages.length && 'IntersectionObserver' in window) {
   const principleObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -88,6 +178,13 @@ if (principleItems.length && principleImages.length && 'IntersectionObserver' in
       const key = entry.target.dataset.principle;
       principleItems.forEach((item) => item.classList.toggle('is-active', item === entry.target));
       principleImages.forEach((image) => image.classList.toggle('is-active', image.dataset.principleImage === key));
+      principleNodes.forEach((node) => node.classList.toggle('is-active', node.dataset.principleNode === key));
+      principlePhotos.forEach((photo) => photo.classList.toggle('is-active', photo.dataset.principlePhoto === key));
+      if (principlesConstellation) {
+        principlesConstellation.classList.remove('is-pulsing');
+        void principlesConstellation.offsetWidth;
+        principlesConstellation.classList.add('is-pulsing');
+      }
     });
   }, { rootMargin: '-38% 0px -38% 0px', threshold: 0 });
 
