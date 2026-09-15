@@ -120,6 +120,9 @@ html{scroll-snap-type:none}
   right:clamp(24px,4vw,60px);
   top:clamp(24px,4vw,60px);
 }
+.project-card:first-child img{object-position:center 55%}
+.cta-button:after{background:#5a061f}
+.cta-button:hover{color:#fff}
 @media(max-width:700px){
   .project-card{height:90svh}
   .project-content{left:24px;top:50%;bottom:auto;transform:translateY(-50%)}

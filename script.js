@@ -5,7 +5,15 @@ import { supabase, supabaseReady, saveProfile, saveLoginCredentials, compressedI
 
 const introBurst = document.querySelector('#intro-burst');
 const introSkip = introBurst?.querySelector('.intro-skip');
-if (introBurst) {
+let skipIntroOnce = false;
+try {
+  skipIntroOnce = window.sessionStorage.getItem('brivia-skip-intro-once') === 'true';
+  if (skipIntroOnce) window.sessionStorage.removeItem('brivia-skip-intro-once');
+} catch {}
+if (introBurst && skipIntroOnce) {
+  introBurst.remove();
+}
+if (introBurst && !skipIntroOnce) {
   document.body.classList.add('intro-active');
   const finishIntro = () => {
     document.body.classList.remove('intro-active');
@@ -662,7 +670,7 @@ if (authCta && authModal) {
   authCta.classList.add('auth-trigger');
   authCta.setAttribute('href', '/auth.html');
   authCta.setAttribute('aria-haspopup', 'dialog');
-  authCta.innerHTML = 'START SWIPING <span class="button-arrows">→</span>';
+  authCta.innerHTML = '<span class="button-label">MAKE IT HAPPEN</span><span class="button-arrows">→</span>';
 }
 
 const resetSignup = () => {
@@ -748,6 +756,7 @@ const openAuth = () => {
 const closeAuth = () => {
   if (!authModal) return;
   if (document.body.classList.contains('auth-page')) {
+    try { window.sessionStorage.setItem('brivia-skip-intro-once', 'true'); } catch {}
     window.location.href = '/';
     return;
   }
@@ -756,6 +765,12 @@ const closeAuth = () => {
   authCloseTimer = window.setTimeout(() => authModal.setAttribute('hidden', ''), 420);
   authCta?.focus();
 };
+
+if (document.body.classList.contains('auth-page')) {
+  window.addEventListener('pagehide', () => {
+    try { window.sessionStorage.setItem('brivia-skip-intro-once', 'true'); } catch {}
+  });
+}
 
 authModal?.querySelector('.auth-close')?.addEventListener('click', closeAuth);
 authModal?.querySelector('[data-auth-close]')?.addEventListener('click', closeAuth);
