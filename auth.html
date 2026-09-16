@@ -13,36 +13,64 @@
   <body class="auth-page auth-open">
     <div class="auth-modal is-open" id="auth-modal">
       <div class="auth-backdrop" data-auth-close></div>
-      <section class="auth-shell" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <section class="auth-shell" role="dialog" aria-modal="true" aria-labelledby="auth-welcome-title">
+        <aside class="auth-story" aria-hidden="true"><p>BRAND<br />BUILDS<br />PEOPLE</p><h2>Good<br />to see<br /><em>you here.</em></h2><span>SAME PEOPLE.<br />BIGGER<br />IDEAS.</span><small>A space to create,<br />collaborate and<br />build what’s next.</small></aside>
+        <div class="auth-envelope-transition" aria-hidden="true">
+          <div class="auth-envelope-scene">
+            <div class="auth-envelope" aria-hidden="true">
+              <div class="auth-envelope-back"></div>
+              <div class="auth-envelope-letter"><span>WELCOME TO</span><strong>THE BRIVIA CLUB</strong></div>
+              <div class="auth-envelope-front"></div>
+              <div class="auth-envelope-flap"></div>
+              <div class="auth-envelope-seal">B</div>
+            </div>
+            <p>OPENING YOUR ROOM</p>
+          </div>
+        </div>
         <button class="auth-close" type="button" aria-label="Go back to Brivia Club">×</button>
+        <div class="auth-phone" aria-hidden="true"></div>
         <div class="auth-visual">
-          <div class="auth-visual-top"><span>THE BRIVIA CLUB</span><span>MEMBERSHIP / 001</span></div>
-          <div class="auth-visual-copy"><p>THE RIGHT CONNECTION</p><h2>FIND<br />YOUR<br /><em>KIND.</em></h2><span>PRIVATE PEOPLE.<br />OPEN POSSIBILITIES.</span></div>
+          <div class="auth-visual-top"><span>IDEAS<br />PEOPLE<br />OPPORTUNITIES</span><span></span></div>
+          <div class="auth-visual-copy"><p>THE BRIVIA CLUB</p><h2>FIND<br />YOUR<br /><em>KIND.</em></h2><span>THOUGHTFUL PEOPLE.<br />REAL MOMENTUM.</span></div>
           <div class="auth-constellation" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
           <div class="auth-visual-bottom"><span>BRIVIA / 2026</span><span>SWIPE WITH INTENT</span></div>
         </div>
         <div class="auth-panel">
           <span class="auth-scrollbar" aria-hidden="true"><span></span></span>
-          <div class="auth-panel-top"><span class="auth-panel-kicker">WELCOME IN</span><span class="auth-step">01 / 02</span></div>
+          <div class="auth-panel-top"><span class="auth-panel-kicker">THE BRIVIA CLUB</span><span class="auth-step">01 / 02</span><button class="auth-top-signup" type="button">NEW HERE? <b>CREATE ACCOUNT</b></button></div>
+          <div class="auth-view auth-welcome" data-auth-view="welcome" hidden>
+            <p class="auth-eyebrow">A PRIVATE NETWORK FOR OPEN MINDS</p>
+            <h1 id="auth-welcome-title">Enter the<br /><em>room.</em></h1>
+            <p class="auth-intro">Thoughtful people, real momentum, and introductions worth having.</p>
+            <div class="auth-choice-card">
+              <p>YOUR PLACE IN THE CLUB</p>
+              <button class="auth-choice-button auth-welcome-login" type="button">LOG IN <span>→</span></button>
+              <button class="auth-choice-button auth-welcome-signup" type="button">SIGN UP <span>→</span></button>
+            </div>
+          </div>
           <div class="auth-view auth-login is-active" data-auth-view="login">
-            <p class="auth-eyebrow">MEMBER ACCESS</p>
-            <h1 id="auth-title">Enter the club.</h1>
-            <p class="auth-intro">A quieter way to meet people who are going somewhere.</p>
+            <p class="auth-eyebrow">RETURNING MEMBER</p>
+            <h1 id="auth-title">Ready to Swipe?</h1>
+            <p class="auth-intro">SAME ENERGY. BIGGER THINGS.</p>
             <form class="auth-form" id="login-form">
-              <label>Email address<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required /></label>
-              <label>Password<input type="password" name="password" autocomplete="current-password" placeholder="••••••••" required /></label>
-              <button class="auth-submit" type="submit">CONTINUE <span>→</span></button>
+              <label>Email address<span class="auth-input-shell"><span class="auth-field-icon" aria-hidden="true">✉</span><input type="email" name="email" autocomplete="email" placeholder="you@yourdomain.com" required /></span></label>
+              <label>Password<span class="auth-input-shell"><span class="auth-field-icon" aria-hidden="true">♙</span><input type="password" name="password" autocomplete="current-password" placeholder="Enter your password" required /><span class="auth-field-eye" aria-hidden="true">◉</span></span></label>
+              <button class="auth-submit" type="submit">LOG IN <span>→</span></button>
+              <button class="auth-forgot" type="button">Forgot password?</button>
             </form>
             <p class="auth-note" id="login-note" aria-live="polite"></p>
-            <div class="auth-divider"><span>OR</span></div>
+            <div class="auth-divider"><span>OR CONTINUE WITH</span></div>
+            <div class="auth-socials" aria-label="Continue with a social account"><button class="auth-google-trigger" type="button" aria-label="Continue with Google"><span class="auth-google-mark" aria-hidden="true">G</span></button><span class="auth-social-placeholder auth-apple" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.96-2.54 4.09zM12.03 7.25C11.88 5.02 13.69 3.18 15.78 3c.29 2.58-2.34 4.5-3.75 4.25z"></path></svg></span><span class="auth-social-placeholder auth-linkedin" aria-hidden="true">in</span></div>
             <button class="auth-secondary auth-create-trigger" type="button">CREATE AN ACCOUNT <span>↗</span></button>
           </div>
 
           <div class="auth-view auth-signup" data-auth-view="signup" hidden>
-            <p class="auth-eyebrow">YOUR INTRODUCTION</p>
-            <h1 id="signup-title">Make your profile.</h1>
-            <p class="auth-intro">Tell us enough to make your next introduction feel natural.</p>
+            <p class="auth-eyebrow">YOUR PLACE IN THE ROOM</p>
+            <h1 id="signup-title">Make your<br /><em>place.</em></h1>
+            <p class="auth-intro">A short profile helps the right people find you inside Brivia.</p>
             <form class="auth-form auth-signup-form" id="signup-form">
+              <div class="signup-progress"><span data-signup-step-label aria-live="polite">STEP 1 OF 2 · THE BASICS</span><div class="signup-progress-track" role="progressbar" aria-label="Profile form progress" aria-valuemin="1" aria-valuemax="2" aria-valuenow="1"><span data-signup-progress-fill></span></div></div>
+              <div class="signup-step" data-signup-step="1">
               <div class="auth-field-grid">
                 <label>Full name<input type="text" name="name" autocomplete="name" placeholder="Your name" required /></label>
                 <label>Email address<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required /></label>
@@ -50,6 +78,12 @@
                 <label>City<input type="text" name="city" autocomplete="address-level2" placeholder="Bengaluru" required /></label>
                 <label>State<input type="text" name="state" autocomplete="address-level1" placeholder="Karnataka" required /></label>
                 <label>Experience<select name="experience" required><option value="" disabled selected>Choose one</option><option>Student / just starting</option><option>1–3 years</option><option>3–7 years</option><option>7–12 years</option><option>12+ years</option></select></label>
+              </div>
+              <button class="auth-submit signup-next" type="button">NEXT: PROFILE DETAILS <span>&rarr;</span></button>
+              </div>
+              <div class="signup-step" data-signup-step="2" hidden>
+              <div class="auth-field-grid">
+                <div class="signup-password-fields"><p class="signup-password-hint">Set a password here and confirm it below. Use this email and password to log in later.</p><label>Password<input type="password" name="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required /></label><label>Confirm password<input type="password" name="passwordConfirm" autocomplete="new-password" minlength="8" placeholder="Re-enter your password" required /></label></div>
               </div>
               <div class="photo-upload" data-photo-upload>
                 <label for="profile-photo">Profile photo</label>
@@ -75,9 +109,11 @@
                 <input class="looking-value" type="hidden" name="lookingFor" aria-required="true" />
                 <p class="looking-helper">Choose one or more · Select Other to write your own.</p>
               </div>
+              <button class="auth-secondary signup-step-prev" type="button">← BACK TO YOUR DETAILS</button>
               <button class="auth-submit" type="submit">CREATE MY PROFILE <span>→</span></button>
+              </div>
             </form>
-            <div class="auth-success" id="auth-success" hidden><span class="auth-success-mark">✓</span><h2>You're on the list.</h2><p>Your email is your login ID. Save this unique password now—it won't be shown again.</p><div class="credential-list"><div class="credential-row"><span>EMAIL ID</span><code data-credential="account-email">you@example.com</code><button type="button" data-copy-credential="account-email">COPY</button></div><div class="credential-row"><span>PASSWORD</span><code data-credential="member-password">••••••••••••</code><button type="button" data-copy-credential="member-password">COPY</button></div></div><button class="auth-secondary auth-close-success" type="button">BACK TO BRIVIA <span>↗</span></button></div>
+            <div class="auth-success" id="auth-success" hidden><span class="auth-success-mark">✓</span><h2 data-auth-success-title>Check your email.</h2><p data-auth-success-message>We sent a verification link. Your email is your login ID; your password stays private and is never shown here.</p><div class="credential-list"><div class="credential-row"><span>LOGIN ID</span><code data-credential="account-email">you@example.com</code><button type="button" data-copy-credential="account-email">COPY</button></div></div><button class="auth-secondary auth-close-success" type="button">BACK TO BRIVIA <span>↗</span></button></div>
             <button class="auth-back-trigger" type="button">← BACK TO LOGIN</button>
           </div>
         </div>

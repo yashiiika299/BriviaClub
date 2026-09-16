@@ -6,21 +6,6 @@ const supabaseKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.V
 export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 export const supabaseReady = Boolean(supabase);
 
-// Auth never exposes a user's password again. This private table stores the
-// generated credential only for the member who owns it, so My Profile can show
-// the exact password that was issued without putting it in public profiles.
-export const saveLoginCredentials = async (userId, email, password) => {
-  if (!supabase || !userId || !password) return { error: null };
-  const { error } = await supabase.from('profile_credentials').upsert({ user_id: userId, email: email || '', login_password: password, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
-  return { error };
-};
-
-export const loadLoginCredentials = async (userId) => {
-  if (!supabase || !userId) return { data: null, error: null };
-  const { data, error } = await supabase.from('profile_credentials').select('email,login_password').eq('user_id', userId).maybeSingle();
-  return { data, error };
-};
-
 const splitValues = (value) => Array.isArray(value) ? value.filter(Boolean) : String(value || '').split(',').map((item) => item.trim()).filter(Boolean);
 
 const compressImage = async (file) => {
@@ -87,7 +72,6 @@ export const saveProfile = async (userId, profile, photoFile) => {
   if (!supabase) return { data: null, error: new Error('Supabase is not configured.') };
   const photoUrl = await uploadProfilePhoto(userId, photoFile);
   const { data, error } = await supabase.from('profiles').upsert(profileToRow(profile, userId, photoUrl), { onConflict: 'id' }).select().single();
-  if (!error && profile.loginPassword) await saveLoginCredentials(userId, profile.email || data?.email || '', profile.loginPassword);
   return { data, error };
 };
 

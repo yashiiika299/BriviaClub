@@ -42,3 +42,12 @@ body.app-body{background:radial-gradient(circle at 84% 6%,rgba(137,43,73,.09),tr
 .pitch-submit{background:var(--app-violet);color:#fffaf1}
 .app-toast{border-color:rgba(40,118,84,.35);background:#edf6f0;color:var(--app-green)}
 @media(prefers-reduced-motion:reduce){.community-track{animation:none}.swipe-card{transition:none}}
+
+/* Desktop members can swipe the profile card with the mouse; keep the swipe controls visible too. */
+.swipe-card{border:4px solid #5a061f;touch-action:pan-y;cursor:grab;user-select:none}
+.swipe-card.is-dragging{cursor:grabbing;transition:none}
+.swipe-card-image{inset:4px;overflow:hidden;border-radius:19px}
+.swipe-card-image img{-webkit-user-drag:none;user-select:none}
+.member-distance{display:none!important}
+@media(max-width:560px){.swipe-card-image{border-radius:13px}}
+ .app-body.app-auth-pending .app-wrap{visibility:hidden}

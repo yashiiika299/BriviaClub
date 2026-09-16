@@ -31,7 +31,7 @@ alter table public.profiles add column if not exists updated_at timestamptz;
 
 notify pgrst, 'reload schema';
 
--- Private credentials table for showing the exact issued password in My Profile.
+-- Legacy credentials table retained for compatibility; the app no longer stores passwords here.
 create table if not exists public.profile_credentials (
   user_id text primary key,
   email text not null default '',
@@ -41,11 +41,8 @@ create table if not exists public.profile_credentials (
 
 alter table public.profile_credentials enable row level security;
 drop policy if exists "Members can view their own login credential" on public.profile_credentials;
-create policy "Members can view their own login credential" on public.profile_credentials for select to authenticated using (auth.uid()::text = user_id::text);
 drop policy if exists "Members can save their own login credential" on public.profile_credentials;
-create policy "Members can save their own login credential" on public.profile_credentials for insert to authenticated with check (auth.uid()::text = user_id::text);
 drop policy if exists "Members can update their own login credential" on public.profile_credentials;
-create policy "Members can update their own login credential" on public.profile_credentials for update to authenticated using (auth.uid()::text = user_id::text) with check (auth.uid()::text = user_id::text);
 
 -- Enable live INSERT events for the chat table.
 do $$

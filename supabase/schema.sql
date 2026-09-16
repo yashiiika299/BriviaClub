@@ -23,11 +23,8 @@ create table if not exists public.profile_credentials (
 
 alter table public.profile_credentials enable row level security;
 drop policy if exists "Members can view their own login credential" on public.profile_credentials;
-create policy "Members can view their own login credential" on public.profile_credentials for select to authenticated using (auth.uid()::text = user_id::text);
 drop policy if exists "Members can save their own login credential" on public.profile_credentials;
-create policy "Members can save their own login credential" on public.profile_credentials for insert to authenticated with check (auth.uid()::text = user_id::text);
 drop policy if exists "Members can update their own login credential" on public.profile_credentials;
-create policy "Members can update their own login credential" on public.profile_credentials for update to authenticated using (auth.uid()::text = user_id::text) with check (auth.uid()::text = user_id::text);
 
 -- Migrate existing projects too. CREATE TABLE IF NOT EXISTS does not add
 -- columns when public.profiles already exists.
@@ -50,8 +47,19 @@ drop trigger if exists on_auth_user_created on auth.users;
 drop function if exists public.handle_new_user();
 
 alter table public.profiles enable row level security;
+create or replace function public.brivia_has_completed_profile()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.profiles where id::text = auth.uid()::text);
+$$;
+revoke all on function public.brivia_has_completed_profile() from public;
+grant execute on function public.brivia_has_completed_profile() to authenticated;
 drop policy if exists "Members can view profiles" on public.profiles;
-create policy "Members can view profiles" on public.profiles for select to authenticated using (true);
+create policy "Members can view profiles" on public.profiles for select to authenticated using (id::text = auth.uid()::text or public.brivia_has_completed_profile());
 drop policy if exists "Members can create their profile" on public.profiles;
 create policy "Members can create their profile" on public.profiles for insert to authenticated with check (auth.uid()::text = id::text);
 drop policy if exists "Members can update their profile" on public.profiles;
@@ -78,9 +86,9 @@ create table if not exists public.matches (
 
 alter table public.matches enable row level security;
 drop policy if exists "Members can view their matches" on public.matches;
-create policy "Members can view their matches" on public.matches for select to authenticated using (auth.uid()::text = user1_id::text or auth.uid()::text = user2_id::text);
+create policy "Members can view their matches" on public.matches for select to authenticated using (public.brivia_has_completed_profile() and (auth.uid()::text = user1_id::text or auth.uid()::text = user2_id::text));
 drop policy if exists "Members can create their matches" on public.matches;
-create policy "Members can create their matches" on public.matches for insert to authenticated with check (auth.uid()::text = user1_id::text);
+create policy "Members can create their matches" on public.matches for insert to authenticated with check (public.brivia_has_completed_profile() and auth.uid()::text = user1_id::text);
 
 create table if not exists public.brivia_messages (
   id uuid primary key default gen_random_uuid(),
@@ -105,6 +113,6 @@ end $$;
 
 alter table public.brivia_messages enable row level security;
 drop policy if exists "Members can view their messages" on public.brivia_messages;
-create policy "Members can view their messages" on public.brivia_messages for select to authenticated using (auth.uid()::text = sender_id::text or auth.uid()::text = recipient_id::text);
+create policy "Members can view their messages" on public.brivia_messages for select to authenticated using (public.brivia_has_completed_profile() and (auth.uid()::text = sender_id::text or auth.uid()::text = recipient_id::text));
 drop policy if exists "Members can send messages" on public.brivia_messages;
-create policy "Members can send messages" on public.brivia_messages for insert to authenticated with check (auth.uid()::text = sender_id::text);
+create policy "Members can send messages" on public.brivia_messages for insert to authenticated with check (public.brivia_has_completed_profile() and auth.uid()::text = sender_id::text);

@@ -1,7 +1,11 @@
 import './style.css';
 import './auth-theme.css';
 import './playground.css';
-import { supabase, supabaseReady, saveProfile, saveLoginCredentials, compressedImageDataUrl } from './supabase.js';
+import './letter-theme.css';
+import './intro-reference.css';
+import './deep-wine-theme.css';
+import './auth-polish.css';
+import { supabase, supabaseReady, saveProfile, compressedImageDataUrl } from './supabase.js';
 
 const introBurst = document.querySelector('#intro-burst');
 const introSkip = introBurst?.querySelector('.intro-skip');
@@ -21,7 +25,7 @@ if (introBurst && !skipIntroOnce) {
     window.setTimeout(() => introBurst.remove(), 500);
   };
   introSkip?.addEventListener('click', finishIntro);
-  window.setTimeout(finishIntro, 10200);
+  window.setTimeout(finishIntro, 2800);
 }
 
 const cursor = document.querySelector('.cursor');
@@ -50,41 +54,12 @@ if (orbitSection && 'IntersectionObserver' in window) {
   orbitObserver.observe(orbitSection);
 }
 
-const flowerHug = document.querySelector('.flower-hug');
-const flowerSection = document.querySelector('.flower-section');
-if (flowerHug && flowerSection && 'IntersectionObserver' in window) {
-      const nextSection = flowerSection.nextElementSibling;
-  let flowerTimer;
-  let bubbleTimer;
-
-  const flowerObserver = new IntersectionObserver(([entry]) => {
-    if (entry.isIntersecting) {
-      clearTimeout(flowerTimer);
-      clearTimeout(bubbleTimer);
-      flowerSection.classList.add('is-visible');
-      flowerSection.classList.remove('bubbles-active');
-      flowerHug.classList.remove('is-visible');
-      void flowerHug.offsetWidth;
-      flowerHug.classList.add('is-visible');
-
-      flowerTimer = setTimeout(() => {
-        if (!flowerSection.classList.contains('is-visible')) return;
-        flowerSection.classList.add('bubbles-active');
-        bubbleTimer = setTimeout(() => {
-          if (nextSection && flowerSection.classList.contains('is-visible')) {
-            window.scrollTo({ top: nextSection.offsetTop, behavior: 'smooth' });
-          }
-        }, 3600);
-      }, 5000);
-    } else {
-      clearTimeout(flowerTimer);
-      clearTimeout(bubbleTimer);
-      flowerSection.classList.remove('is-visible');
-      flowerSection.classList.remove('bubbles-active');
-      flowerHug.classList.remove('is-visible');
-    }
-  }, { threshold: 0.05 });
-  flowerObserver.observe(flowerSection);
+const letterSection = document.querySelector('.letter-section');
+if (letterSection && 'IntersectionObserver' in window) {
+  const letterObserver = new IntersectionObserver(([entry]) => {
+    letterSection.classList.toggle('is-visible', entry.isIntersecting);
+  }, { threshold: 0.2 });
+  letterObserver.observe(letterSection);
 }
 
 const principleItems = document.querySelectorAll('.principle');
@@ -366,19 +341,36 @@ if (showreelSection && showreelToggle) {
 
 const authModal = document.querySelector('#auth-modal');
 const authCta = document.querySelector('.hero-nav .cta-button');
+const isStandaloneAuthPage = document.body.classList.contains('auth-page');
+let authHistoryView = isStandaloneAuthPage ? 'login' : 'welcome';
+if (isStandaloneAuthPage) {
+  window.history.replaceState({ briviaAuthView: 'login' }, '', window.location.href);
+}
 const authViews = document.querySelectorAll('[data-auth-view]');
 const authStep = authModal?.querySelector('.auth-step');
 const authPanelKicker = authModal?.querySelector('.auth-panel-kicker');
+const authShell = authModal?.querySelector('.auth-shell');
 const authPanel = authModal?.querySelector('.auth-panel');
 const authScrollbarThumb = authModal?.querySelector('.auth-scrollbar span');
 const signupForm = document.querySelector('#signup-form');
 const signupSuccess = document.querySelector('#auth-success');
 const loginForm = document.querySelector('#login-form');
 const loginNote = document.querySelector('#login-note');
+const signupPasswordFields = signupForm?.querySelector('.signup-password-fields');
+const signupStepOne = signupForm?.querySelector('[data-signup-step="1"]');
+const signupStepLabel = signupForm?.querySelector('[data-signup-step-label]');
+const signupProgress = signupForm?.querySelector('.signup-progress-track');
+const signupProgressFill = signupForm?.querySelector('[data-signup-progress-fill]');
+let signupCurrentStep = 1;
+let profileCompletionUser = null;
 let authCloseTimer;
+let authEnvelopeTimer;
 let resetSkills = () => {};
 let resetLooking = () => {};
 let resetPhoto = () => {};
+let fillSkills = () => {};
+let fillLooking = () => {};
+let profileCompletionPhotoUrl = '';
 
 const photoUpload = document.querySelector('[data-photo-upload]');
 if (photoUpload) {
@@ -525,6 +517,11 @@ if (skillsPicker) {
     syncSkills();
     renderSkills();
   };
+  fillSkills = (value) => {
+    selectedSkills.splice(0, selectedSkills.length, ...String(value || '').split(',').map((item) => item.trim()).filter(Boolean));
+    syncSkills();
+    renderSkills();
+  };
   skillsSearch?.addEventListener('focus', () => { skillsPicker.classList.add('is-open'); renderSkills(); });
   skillsSearch?.addEventListener('input', () => { skillsPicker.classList.add('is-open'); renderSkills(); });
   skillsSearch?.addEventListener('keydown', (event) => {
@@ -539,10 +536,11 @@ if (skillsPicker) {
     addSkill(skillsOtherInput.value);
   });
   document.addEventListener('click', (event) => {
-    if (!skillsPicker.contains(event.target)) {
+    const clickedInsidePicker = event.composedPath().includes(skillsPicker);
+    if (!clickedInsidePicker) {
       skillsPicker.classList.remove('is-open');
       skillsSearch?.setAttribute('aria-expanded', 'false');
-    } else skillsSearch?.setAttribute('aria-expanded', 'true');
+    } else skillsSearch?.setAttribute('aria-expanded', String(skillsPicker.classList.contains('is-open')));
   });
   renderSkills();
 }
@@ -645,6 +643,11 @@ if (lookingPicker) {
     syncLooking();
     renderLooking();
   };
+  fillLooking = (value) => {
+    selectedLooking.splice(0, selectedLooking.length, ...String(value || '').split(',').map((item) => item.trim()).filter(Boolean));
+    syncLooking();
+    renderLooking();
+  };
   lookingSearch?.addEventListener('focus', () => { lookingPicker.classList.add('is-open'); renderLooking(); });
   lookingSearch?.addEventListener('input', () => { lookingPicker.classList.add('is-open'); renderLooking(); });
   lookingSearch?.addEventListener('keydown', (event) => {
@@ -658,10 +661,11 @@ if (lookingPicker) {
     addLooking(lookingOtherInput.value);
   });
   document.addEventListener('click', (event) => {
-    if (!lookingPicker.contains(event.target)) {
+    const clickedInsidePicker = event.composedPath().includes(lookingPicker);
+    if (!clickedInsidePicker) {
       lookingPicker.classList.remove('is-open');
       lookingSearch?.setAttribute('aria-expanded', 'false');
-    } else lookingSearch?.setAttribute('aria-expanded', 'true');
+    } else lookingSearch?.setAttribute('aria-expanded', String(lookingPicker.classList.contains('is-open')));
   });
   renderLooking();
 }
@@ -670,7 +674,7 @@ if (authCta && authModal) {
   authCta.classList.add('auth-trigger');
   authCta.setAttribute('href', '/auth.html');
   authCta.setAttribute('aria-haspopup', 'dialog');
-  authCta.innerHTML = '<span class="button-label">MAKE IT HAPPEN</span><span class="button-arrows">→</span>';
+  authCta.innerHTML = '<span class="button-label">START SWIPING</span><span class="button-arrows">→</span>';
 }
 
 const resetSignup = () => {
@@ -678,21 +682,65 @@ const resetSignup = () => {
   resetSkills();
   resetLooking();
   resetPhoto();
+  profileCompletionUser = null;
+  profileCompletionPhotoUrl = '';
+  signupForm?.elements.namedItem('email')?.removeAttribute('readonly');
+  setSignupPasswordMode(true);
+  setSignupStep(1, false);
+  const submit = signupForm?.querySelector('[type="submit"]');
+  if (submit) submit.innerHTML = 'CREATE MY PROFILE <span>→</span>';
   signupForm?.removeAttribute('hidden');
   signupSuccess?.setAttribute('hidden', '');
   const backButton = authModal?.querySelector('.auth-back-trigger');
-  if (backButton) backButton.removeAttribute('hidden');
+  if (backButton) {
+    backButton.removeAttribute('hidden');
+    backButton.textContent = '← BACK TO LOGIN';
+  }
 };
 
-const randomCredential = (characters, length) => {
-  const values = new Uint32Array(length);
-  window.crypto.getRandomValues(values);
-  return Array.from(values, (value) => characters[value % characters.length]).join('');
-};
+function setSignupPasswordMode(enabled) {
+  if (!signupPasswordFields) return;
+  signupPasswordFields.toggleAttribute('hidden', !enabled);
+  signupPasswordFields.querySelectorAll('input').forEach((input) => {
+    input.required = enabled;
+    if (!enabled) input.value = '';
+  });
+}
 
-const createMemberCredentials = () => ({
-  password: `${randomCredential('ABCDEFGHJKLMNPQRSTUVWXYZ', 4)}-${randomCredential('abcdefghijkmnopqrstuvwxyz', 4)}-${randomCredential('23456789', 4)}!`,
+function setSignupStep(step, focusFirst = true) {
+  signupCurrentStep = step === 2 ? 2 : 1;
+  signupForm?.querySelectorAll('[data-signup-step]').forEach((panel) => {
+    panel.toggleAttribute('hidden', Number(panel.dataset.signupStep) !== signupCurrentStep);
+  });
+  if (signupStepLabel) signupStepLabel.textContent = signupCurrentStep === 1 ? 'STEP 1 OF 2 · THE BASICS' : 'STEP 2 OF 2 · YOUR SIGNALS';
+  if (signupProgress) signupProgress.setAttribute('aria-valuenow', String(signupCurrentStep));
+  if (signupProgressFill) signupProgressFill.style.width = signupCurrentStep === 1 ? '50%' : '100%';
+  authPanel?.scrollTo({ top: 0, behavior: 'smooth' });
+  if (focusFirst) {
+    const activeStep = signupForm?.querySelector(`[data-signup-step="${signupCurrentStep}"]`);
+    const firstVisibleField = [...(activeStep?.querySelectorAll('input:not([type="hidden"]):not([type="file"]), select, textarea') || [])]
+      .find((field) => field.getClientRects().length && !field.disabled);
+    firstVisibleField?.focus({ preventScroll: true });
+  }
+}
+
+const signupNextButton = signupForm?.querySelector('.signup-next');
+const signupPrevButton = signupForm?.querySelector('.signup-step-prev');
+const validateSignupStepOne = () => {
+  if (!signupStepOne) return true;
+  const fields = [...signupStepOne.querySelectorAll('input, select, textarea')].filter((field) => field.type !== 'hidden' && !field.disabled);
+  for (const field of fields) {
+    if (!field.checkValidity()) {
+      field.reportValidity();
+      return false;
+    }
+  }
+  return true;
+};
+signupNextButton?.addEventListener('click', () => {
+  if (validateSignupStepOne()) setSignupStep(2);
 });
+signupPrevButton?.addEventListener('click', () => setSignupStep(1));
 
 const signupFeedback = signupForm ? document.createElement('p') : null;
 if (signupFeedback && signupForm) {
@@ -702,6 +750,13 @@ if (signupFeedback && signupForm) {
   signupForm.setAttribute('novalidate', '');
   signupForm.after(signupFeedback);
 }
+
+const signupSuccessTitle = signupSuccess?.querySelector('h2');
+const signupSuccessMessage = signupSuccess?.querySelector('p');
+signupSuccessTitle?.setAttribute('data-auth-success-title', '');
+signupSuccessMessage?.setAttribute('data-auth-success-message', '');
+signupSuccess?.querySelector('[data-credential="member-password"]')?.closest('.credential-row')?.remove();
+if (signupSuccessMessage) signupSuccessMessage.textContent = 'We sent a verification link. Your email is your login ID; your password stays private and is never shown here.';
 
 signupSuccess?.querySelectorAll('[data-copy-credential]').forEach((button) => {
   button.addEventListener('click', async () => {
@@ -717,15 +772,116 @@ signupSuccess?.querySelectorAll('[data-copy-credential]').forEach((button) => {
   });
 });
 
-const setAuthView = (view) => {
+const setAuthView = (view, historyMode = 'push') => {
+  if (isStandaloneAuthPage && view !== authHistoryView && historyMode !== 'none') {
+    const state = { briviaAuthView: view };
+    if (historyMode === 'replace') window.history.replaceState(state, '', window.location.href);
+    else window.history.pushState(state, '', window.location.href);
+  }
+  authHistoryView = view;
   authViews.forEach((item) => {
     const isActive = item.dataset.authView === view;
     item.classList.toggle('is-active', isActive);
     item.toggleAttribute('hidden', !isActive);
   });
-  if (authStep) authStep.textContent = view === 'login' ? '01 / 02' : '02 / 02';
-  if (authPanelKicker) authPanelKicker.textContent = view === 'login' ? 'WELCOME IN' : 'MEMBER APPLICATION';
+  if (authStep) authStep.textContent = view === 'welcome' ? 'WELCOME' : view === 'login' ? '01 / 02' : '02 / 02';
+  if (authPanelKicker) authPanelKicker.textContent = view === 'welcome' ? 'THE BRIVIA CLUB' : view === 'login' ? 'RETURNING MEMBER' : 'YOUR APPLICATION';
+  const authTopSignup = authModal?.querySelector('.auth-top-signup');
+  if (authTopSignup) authTopSignup.innerHTML = view === 'signup' ? 'ALREADY A MEMBER? <b>LOG IN</b>' : 'NEW HERE? <b>CREATE ACCOUNT</b>';
+  if (authShell) authShell.setAttribute('aria-labelledby', view === 'welcome' ? 'auth-welcome-title' : view === 'login' ? 'auth-title' : 'signup-title');
   if (view === 'signup') signupForm?.querySelector('input')?.focus();
+};
+
+if (isStandaloneAuthPage) {
+  window.addEventListener('popstate', (event) => {
+    setAuthView(event.state?.briviaAuthView || 'welcome', 'none');
+  });
+}
+
+const startGoogleAuth = async () => {
+  if (!supabaseReady || !supabase) {
+    if (loginNote) loginNote.textContent = 'Google sign-in is not configured yet. Please use email and password.';
+    if (signupFeedback) signupFeedback.textContent = 'Google sign-in is not configured yet. Please use email and password.';
+    return;
+  }
+  const buttons = authModal?.querySelectorAll('.auth-google-trigger') || [];
+  buttons.forEach((button) => { button.disabled = true; });
+  if (loginNote) loginNote.textContent = 'Connecting to Google...';
+  if (signupFeedback) signupFeedback.textContent = 'Connecting to Google...';
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth.html`, queryParams: { prompt: 'select_account' } },
+    });
+    if (!error) return;
+    buttons.forEach((button) => { button.disabled = false; });
+    if (loginNote) loginNote.textContent = error.message || 'Google sign-in could not start.';
+    if (signupFeedback) signupFeedback.textContent = error.message || 'Google sign-in could not start.';
+  } catch (error) {
+    buttons.forEach((button) => { button.disabled = false; });
+    if (loginNote) loginNote.textContent = error.message || 'Google sign-in could not start.';
+    if (signupFeedback) signupFeedback.textContent = error.message || 'Google sign-in could not start.';
+  }
+};
+
+const showProfileCompletion = (user, savedProfile = null) => {
+  if (!signupForm || !user) return;
+  resetSignup();
+  profileCompletionUser = user;
+  const metadata = user.user_metadata || {};
+  const profile = savedProfile || {};
+  const values = {
+    name: profile.name || metadata.name || metadata.full_name || '',
+    email: user.email || profile.email || '',
+    phone: profile.phone || metadata.phone || '',
+    city: profile.city || metadata.city || '',
+    state: profile.state || metadata.state || '',
+    experience: profile.experience || metadata.experience || '',
+  };
+  Object.entries(values).forEach(([name, value]) => {
+    const field = signupForm.elements.namedItem(name);
+    if (field && value) field.value = value;
+  });
+  const emailField = signupForm.elements.namedItem('email');
+  emailField?.setAttribute('readonly', '');
+  fillSkills(profile.skills || metadata.skills || '');
+  fillLooking(profile.lookingFor || profile.looking_for || metadata.lookingFor || metadata.looking_for || '');
+  profileCompletionPhotoUrl = profile.photoUrl || metadata.avatar_url || metadata.picture || '';
+  setSignupPasswordMode(false);
+  const submit = signupForm.querySelector('[type="submit"]');
+  if (submit) submit.innerHTML = 'COMPLETE MY PROFILE <span>→</span>';
+  const backButton = authModal?.querySelector('.auth-back-trigger');
+  if (backButton) backButton.textContent = 'SIGN OUT / BACK TO LOGIN';
+  if (signupFeedback) signupFeedback.textContent = 'Finish your Brivia profile to unlock the club. Your email is verified with Google.';
+  setAuthView('signup');
+};
+
+const restoreAuthPageSession = async () => {
+  if (!document.body.classList.contains('auth-page') || !supabaseReady || !supabase) return;
+  const params = new URLSearchParams(window.location.search);
+  const oauthError = params.get('error_description') || params.get('error');
+  if (oauthError) {
+    setAuthView('login');
+    if (loginNote) loginNote.textContent = oauthError.replaceAll('+', ' ');
+    window.history.replaceState({ briviaAuthView: 'login' }, '', '/auth.html');
+    return;
+  }
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError || !session?.user) return;
+  const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+  if (error) {
+    setAuthView('login');
+    if (loginNote) loginNote.textContent = `We couldn't verify your Brivia profile: ${error.message}`;
+    return;
+  }
+  if (profile) {
+    window.location.replace('/app.html');
+    return;
+  }
+  const pending = JSON.parse(window.localStorage.getItem('brivia-pending-profile') || 'null');
+  const pendingMatches = pending?.email?.toLowerCase() === session.user.email?.toLowerCase();
+  showProfileCompletion(session.user, pendingMatches ? pending : null);
+  window.history.replaceState({ briviaAuthView: 'signup' }, '', '/auth.html');
 };
 
 const updateAuthScrollbar = () => {
@@ -745,8 +901,10 @@ window.requestAnimationFrame(updateAuthScrollbar);
 const openAuth = () => {
   if (!authModal) return;
   window.clearTimeout(authCloseTimer);
+  window.clearTimeout(authEnvelopeTimer);
+  authShell?.classList.remove('is-envelope-opening');
   resetSignup();
-  setAuthView('login');
+  setAuthView(authModal.querySelector('[data-auth-view="login"]') ? 'login' : 'welcome');
   authModal.removeAttribute('hidden');
   document.body.classList.add('auth-open');
   window.requestAnimationFrame(() => authModal.classList.add('is-open'));
@@ -755,6 +913,8 @@ const openAuth = () => {
 
 const closeAuth = () => {
   if (!authModal) return;
+  window.clearTimeout(authEnvelopeTimer);
+  authShell?.classList.remove('is-envelope-opening');
   if (document.body.classList.contains('auth-page')) {
     try { window.sessionStorage.setItem('brivia-skip-intro-once', 'true'); } catch {}
     window.location.href = '/';
@@ -772,10 +932,31 @@ if (document.body.classList.contains('auth-page')) {
   });
 }
 
+const openAuthEnvelope = (view) => {
+  if (!authShell || authShell.classList.contains('is-envelope-opening')) return;
+  window.clearTimeout(authEnvelopeTimer);
+  authShell.classList.add('is-envelope-opening');
+  authEnvelopeTimer = window.setTimeout(() => {
+    setAuthView(view);
+    authShell.classList.remove('is-envelope-opening');
+  }, 1420);
+};
+
 authModal?.querySelector('.auth-close')?.addEventListener('click', closeAuth);
 authModal?.querySelector('[data-auth-close]')?.addEventListener('click', closeAuth);
+authModal?.querySelector('.auth-welcome-login')?.addEventListener('click', () => openAuthEnvelope('login'));
+authModal?.querySelector('.auth-welcome-signup')?.addEventListener('click', () => openAuthEnvelope('signup'));
+authModal?.querySelector('.auth-top-signup')?.addEventListener('click', () => setAuthView(authHistoryView === 'signup' ? 'login' : 'signup'));
 authModal?.querySelector('.auth-create-trigger')?.addEventListener('click', () => setAuthView('signup'));
-authModal?.querySelector('.auth-back-trigger')?.addEventListener('click', () => setAuthView('login'));
+authModal?.querySelectorAll('.auth-google-trigger').forEach((button) => button.addEventListener('click', startGoogleAuth));
+authModal?.querySelector('.auth-back-trigger')?.addEventListener('click', async () => {
+  if (profileCompletionUser && supabase) {
+    await supabase.auth.signOut();
+    window.localStorage.removeItem('brivia-pending-profile');
+  }
+  resetSignup();
+  setAuthView('login');
+});
 authModal?.querySelector('.auth-close-success')?.addEventListener('click', closeAuth);
 
 loginForm?.addEventListener('submit', async (event) => {
@@ -790,24 +971,27 @@ loginForm?.addEventListener('submit', async (event) => {
     if (!supabaseReady || !supabase) throw new Error('Supabase is not configured.');
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    // Keep the exact password the member just proved, including for accounts
-    // created before the private credentials table was added.
-    await saveLoginCredentials(data.user.id, data.user.email || email, password);
     const pending = JSON.parse(window.localStorage.getItem('brivia-pending-profile') || 'null');
     const pendingBelongsToUser = pending?.email?.toLowerCase() === data.user?.email?.toLowerCase();
     if (pending && data.user && pendingBelongsToUser) {
-      const { error: profileError } = await saveProfile(data.user.id, pending, null);
+      const safePending = { ...pending };
+      delete safePending.loginPassword;
+      delete safePending.password;
+      delete safePending.passwordConfirm;
+      const { error: profileError } = await saveProfile(data.user.id, safePending, null);
       if (profileError) throw profileError;
       window.localStorage.removeItem('brivia-pending-profile');
-      window.localStorage.setItem('brivia-member-profile', JSON.stringify({ ...pending, id: data.user.id, loginPassword: pending.loginPassword || password }));
+      window.localStorage.setItem('brivia-member-profile', JSON.stringify({ ...safePending, id: data.user.id }));
     } else if (pending && !pendingBelongsToUser) {
       window.localStorage.removeItem('brivia-pending-profile');
     }
-    // The password just accepted by Supabase is the source of truth. Keep it
-    // in the local profile as an immediate fallback until the private table is
-    // available (and so an old cached password can never remain displayed).
-    const currentCachedProfile = JSON.parse(window.localStorage.getItem('brivia-member-profile') || 'null') || {};
-    window.localStorage.setItem('brivia-member-profile', JSON.stringify({ ...currentCachedProfile, id: data.user.id, email: data.user.email || email, loginPassword: password }));
+    const { data: ownProfile, error: ownProfileError } = await supabase.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
+    if (ownProfileError) throw ownProfileError;
+    if (!ownProfile) {
+      showProfileCompletion(data.user, pendingBelongsToUser ? pending : null);
+      return;
+    }
+    window.localStorage.setItem('brivia-member-profile', JSON.stringify({ id: data.user.id, email: data.user.email || email }));
     window.location.href = '/app.html';
   } catch (error) {
     if (loginNote) loginNote.textContent = error.message || 'Could not sign you in. Check your email and password.';
@@ -818,6 +1002,11 @@ loginForm?.addEventListener('submit', async (event) => {
 
 signupForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (signupCurrentStep === 1) {
+    if (validateSignupStepOne()) setSignupStep(2);
+    return;
+  }
+  signupForm.elements.namedItem('passwordConfirm')?.setCustomValidity('');
   if (!signupForm.checkValidity()) {
     signupForm.reportValidity();
     if (signupFeedback) signupFeedback.textContent = 'Please complete all required fields.';
@@ -831,36 +1020,82 @@ signupForm?.addEventListener('submit', async (event) => {
     if (signupFeedback) signupFeedback.textContent = 'Select at least one skill and one thing you are looking for.';
     return;
   }
-  const profile = Object.fromEntries(new FormData(signupForm).entries());
+  const formData = new FormData(signupForm);
+  const password = String(formData.get('password') || '');
+  const passwordConfirm = String(formData.get('passwordConfirm') || '');
+  if (!profileCompletionUser && password !== passwordConfirm) {
+    const confirmField = signupForm.elements.namedItem('passwordConfirm');
+    confirmField?.setCustomValidity('Passwords do not match.');
+    confirmField?.reportValidity();
+    confirmField?.addEventListener('input', () => confirmField.setCustomValidity(''), { once: true });
+    if (signupFeedback) signupFeedback.textContent = 'Your passwords do not match.';
+    return;
+  }
+  const profile = Object.fromEntries(formData.entries());
+  delete profile.password;
+  delete profile.passwordConfirm;
   const photoFile = signupForm.querySelector('.photo-input')?.files?.[0] || null;
   profile.photoName = photoFile?.name || '';
   if (photoFile) {
     try { profile.photoUrl = await compressedImageDataUrl(photoFile); } catch { profile.photoUrl = ''; }
-  }
-  const credentials = createMemberCredentials();
-  profile.loginPassword = credentials.password;
-  const submit = signupForm.querySelector('.auth-submit');
+  } else if (profileCompletionPhotoUrl) profile.photoUrl = profileCompletionPhotoUrl;
+  const submit = signupForm.querySelector('[type="submit"]');
   if (submit) submit.disabled = true;
   if (signupFeedback) signupFeedback.textContent = 'Saving your profile...';
   try {
     if (!supabaseReady || !supabase) throw new Error('Supabase is not configured.');
-    let userId = '';
-    let sessionAvailable = false;
-    const { data, error } = await supabase.auth.signUp({ email: profile.email, password: credentials.password, options: { data: { name: profile.name } } });
-    if (error) throw error;
-    userId = data.user?.id || '';
-    sessionAvailable = Boolean(data.session);
-    if (userId && sessionAvailable) {
-      const { error: profileError } = await saveProfile(userId, profile, photoFile);
+    let sessionUser = profileCompletionUser;
+    if (sessionUser) {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!sessionData.session?.user || sessionData.session.user.id !== sessionUser.id) throw new Error('Your sign-in session expired. Please continue with Google or log in again.');
+      sessionUser = sessionData.session.user;
+      if (profile.email.toLowerCase() !== sessionUser.email?.toLowerCase()) throw new Error('Use the verified email attached to this account.');
+      const { error: profileError } = await saveProfile(sessionUser.id, profile, photoFile);
       if (profileError) throw profileError;
-    } else if (userId) {
-      window.localStorage.setItem('brivia-pending-profile', JSON.stringify(profile));
+      window.localStorage.removeItem('brivia-pending-profile');
+      window.localStorage.setItem('brivia-member-profile', JSON.stringify({ ...profile, id: sessionUser.id }));
+      window.location.href = '/app.html';
+      return;
     }
-    window.localStorage.setItem('brivia-member-profile', JSON.stringify({ ...profile, id: userId }));
+
+    const { data, error } = await supabase.auth.signUp({
+      email: profile.email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth.html`,
+        data: {
+          name: profile.name,
+          full_name: profile.name,
+          phone: profile.phone,
+          city: profile.city,
+          state: profile.state,
+          experience: profile.experience,
+          skills: profile.skills,
+          lookingFor: profile.lookingFor,
+        },
+      },
+    });
+    if (error) throw error;
+    if (!data.user) throw new Error('We could not create your account. Please try again.');
+    if (data.session) {
+      profileCompletionUser = data.user;
+      signupForm.elements.namedItem('email')?.setAttribute('readonly', '');
+      setSignupPasswordMode(false);
+      if (submit) submit.innerHTML = 'COMPLETE MY PROFILE <span>→</span>';
+      const { error: profileError } = await saveProfile(data.user.id, profile, photoFile);
+      if (profileError) throw profileError;
+      window.localStorage.setItem('brivia-member-profile', JSON.stringify({ ...profile, id: data.user.id }));
+      window.location.href = '/app.html';
+      return;
+    }
+    window.localStorage.setItem('brivia-pending-profile', JSON.stringify(profile));
     const accountEmail = signupSuccess?.querySelector('[data-credential="account-email"]');
-    const memberPassword = signupSuccess?.querySelector('[data-credential="member-password"]');
     if (accountEmail) accountEmail.textContent = profile.email;
-    if (memberPassword) memberPassword.textContent = credentials.password;
+    const successTitle = signupSuccess?.querySelector('[data-auth-success-title]');
+    const successMessage = signupSuccess?.querySelector('[data-auth-success-message]');
+    if (successTitle) successTitle.textContent = 'Check your email.';
+    if (successMessage) successMessage.textContent = 'We sent a verification link. Verify your email, then sign in to finish activating your Brivia profile. Supabase manages your password securely; Brivia never displays it or saves it in your profile.';
     signupForm.setAttribute('hidden', '');
     if (signupFeedback) signupFeedback.textContent = '';
     signupSuccess?.removeAttribute('hidden');
@@ -874,6 +1109,8 @@ signupForm?.addEventListener('submit', async (event) => {
     if (submit) submit.disabled = false;
   }
 });
+
+if (document.body.classList.contains('auth-page')) void restoreAuthPageSession();
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && authModal?.classList.contains('is-open')) closeAuth();

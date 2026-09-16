@@ -1,17 +1,23 @@
 import './app.css';
 import './inbox.css';
+import './inbox-actions.css';
+import './chat-wallpaper.css';
+import './profile-theme.css';
 import './profile-photo.css';
-import { supabase, rowToProfile, saveProfile, loadLoginCredentials } from './supabase.js';
+import './explore-theme.css';
+import './deep-wine-theme.css';
+import './inbox-linkedin.css';
+import './explore-polish.css';
+import './member-polish.css';
+import { supabase, rowToProfile, saveProfile } from './supabase.js';
+
+document.body.classList.add('app-auth-pending');
+let appBackGuardActive = false;
  
 
 // Never render cached profile data as the current user. The authenticated
-// Supabase session is the source of truth; cached data is used only for the
-// current user's one-time password display after session verification.
+// Supabase session and completed profile are the source of truth.
 let memberProfile = {};
-/*
-  name: 'New Member', email: 'member@brivia.club', city: 'Your city', state: 'Your state', skills: '', lookingFor: '', experience: '', loginPassword: '—',
-};
-*/
 
 let people = [];
 let remoteMatchIds = [];
@@ -27,6 +33,23 @@ const chatMessages = {};
 const readChatIds = new Set();
 let messageSyncTimer = null;
 const overlayIds = ['info-modal', 'pitch-modal'];
+const hiddenChatsStorageKey = () => `brivia-hidden-chats:${memberProfile.id || 'anonymous'}`;
+const readHiddenChatIds = () => {
+  try {
+    const ids = JSON.parse(window.localStorage.getItem(hiddenChatsStorageKey()) || '[]');
+    return new Set(Array.isArray(ids) ? ids.map(String) : []);
+  } catch { return new Set(); }
+};
+const saveHiddenChatIds = (ids) => {
+  try {
+    window.localStorage.setItem(hiddenChatsStorageKey(), JSON.stringify([...ids]));
+    return true;
+  } catch { return false; }
+};
+const restoreChatForMe = (personId) => {
+  const hiddenIds = readHiddenChatIds();
+  if (hiddenIds.delete(String(personId))) saveHiddenChatIds(hiddenIds);
+};
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
 const initials = (name = 'New Member') => name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
@@ -88,7 +111,7 @@ const renderHome = () => {
   const name = document.querySelector('#swipe-name'); if (name) name.textContent = currentPerson.name;
   const age = document.querySelector('#swipe-age'); if (age) age.textContent = currentPerson.age;
   const role = document.querySelector('#swipe-role'); if (role) role.textContent = currentPerson.role;
-  const location = document.querySelector('#swipe-location'); if (location) location.textContent = `${currentPerson.city} · ${currentPerson.distance}`;
+  const location = document.querySelector('#swipe-location'); if (location) location.textContent = currentPerson.city || currentPerson.state || '';
   const tags = document.querySelector('#swipe-tags'); if (tags) tags.innerHTML = currentPerson.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('');
   const count = document.querySelector('#queue-count'); if (count) count.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(people.length).padStart(2, '0')}`;
   card?.classList.remove('is-passing', 'is-liking');
@@ -102,6 +125,7 @@ const saveMatches = async (person) => {
     return false;
   }
   if (!remoteMatchIds.includes(person.id)) remoteMatchIds.push(person.id);
+  restoreChatForMe(person.id);
   renderChats();
   return true;
 };
@@ -143,7 +167,10 @@ const renderExplore = () => {
     const haystack = `${person.name} ${person.role} ${person.city} ${person.state || ''} ${person.experience || ''} ${person.email || ''} ${person.phone || ''} ${person.skills || ''} ${person.lookingFor || ''} ${person.tags.join(' ')}`.toLowerCase();
     return matchesFilter && haystack.includes(query);
   });
-  if (list) list.innerHTML = filtered.length ? filtered.map((person) => `<article class="explore-row"><div class="explore-row-avatar">${renderAvatar(person)}</div><div class="explore-row-copy"><strong>${escapeHtml(person.name)}, ${person.age}</strong><span>${escapeHtml(person.role)} · ${escapeHtml(person.city)}</span><div class="explore-row-tags">${person.tags.slice(0, 2).map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div></div><button class="row-action" data-profile-id="${person.id}">VIEW ↗</button></article>`).join('') : '<p class="empty-state">No people match that search yet. Try another filter.</p>';
+  if (list) list.innerHTML = filtered.length ? filtered.map((person) => {
+    const intent = person.lookingFor?.split(',')[0]?.trim() || 'Open to intentional connections';
+    return `<article class="explore-row"><div class="explore-row-avatar">${renderAvatar(person)}</div><div class="explore-row-copy"><div class="explore-row-name"><strong>${escapeHtml(person.name)}, ${person.age}</strong><span class="explore-row-verified">✓</span></div><span class="explore-row-role">${escapeHtml(person.role)} · ${escapeHtml(person.city)}</span><p class="explore-row-intent">${escapeHtml(intent)}</p><div class="explore-row-tags">${person.tags.slice(0, 2).map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div></div><button class="row-action" data-profile-id="${person.id}"><span>VIEW PROFILE</span><b>↗</b></button></article>`;
+  }).join('') : '<p class="empty-state">No people match that search yet. Try another filter.</p>';
   document.querySelector('#explore-count').textContent = `${String(filtered.length).padStart(2, '0')} PEOPLE`;
   list?.querySelectorAll('[data-profile-id]').forEach((button) => button.addEventListener('click', () => { const person = people.find((item) => item.id === button.dataset.profileId); if (person) { fillInfo(person); openOverlay('info-modal'); } }));
 };
@@ -174,7 +201,8 @@ const formatChatTime = (value) => {
 
 const renderChats = () => {
   ensureInboxControls();
-  const conversations = people.filter((person) => remoteMatchIds.includes(person.id));
+  const hiddenChatIds = readHiddenChatIds();
+  const conversations = people.filter((person) => remoteMatchIds.includes(person.id) && !hiddenChatIds.has(String(person.id)));
   const query = chatSearchQuery.trim().toLowerCase();
   const matches = conversations.filter((person) => {
     const last = chatMessages[person.id]?.at(-1);
@@ -183,14 +211,29 @@ const renderChats = () => {
     return (!query || haystack.includes(query)) && (activeChatFilter !== 'unread' || unread);
   });
   const list = document.querySelector('#chat-list');
-  if (list) list.innerHTML = `<div class="inbox-panel-head"><strong>Messages</strong><span>${conversations.length}</span></div>${matches.length ? matches.map((person) => {
+  if (list) list.innerHTML = `<div class="inbox-panel-head"><div><strong>YOUR THREADS</strong><span>Private conversations</span></div><b>${conversations.length}</b></div>${matches.length ? matches.map((person) => {
     const last = chatMessages[person.id]?.at(-1);
     const unread = last?.from === 'them' && !readChatIds.has(person.id);
-    return `<button class="chat-row${unread ? ' is-unread' : ''}${selectedChat?.id === person.id ? ' is-selected' : ''}" type="button" data-chat-id="${escapeHtml(person.id)}">${renderAvatar(person)}<span class="chat-row-copy"><strong>${escapeHtml(person.name)}</strong><span>${escapeHtml(last?.text || 'Start a conversation')}</span></span><span class="chat-row-meta"><time>${escapeHtml(formatChatTime(last?.createdAt))}</time>${unread ? '<b>1</b>' : ''}</span></button>`;
-  }).join('') : '<div class="inbox-empty"><strong>No conversations found</strong><span>Send a pitch or wait for a reply to start an inbox thread.</span></div>'}`;
+    return `<div class="chat-row${unread ? ' is-unread' : ''}${selectedChat?.id === person.id ? ' is-selected' : ''}"><button class="chat-row-open" type="button" data-chat-id="${escapeHtml(person.id)}">${renderAvatar(person)}<span class="chat-row-copy"><strong>${escapeHtml(person.name)}</strong><span>${escapeHtml(last?.text || 'Start a conversation')}</span></span><span class="chat-row-meta"><time>${escapeHtml(formatChatTime(last?.createdAt))}</time>${unread ? '<b>1</b>' : ''}</span></button><button class="chat-delete" type="button" data-delete-chat-id="${escapeHtml(person.id)}" aria-label="Delete chat with ${escapeHtml(person.name)}" title="Delete chat"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 6h11M8 3.5h4M6.5 6l.6 10h5.8l.6-10M8.5 8.5v5M11.5 8.5v5"/></svg></button></div>`;
+  }).join('') : '<div class="inbox-empty"><strong>No threads found</strong><span>Send a pitch from Explore to open a private conversation.</span><button type="button" class="inbox-empty-action" data-nav="explore">EXPLORE PEOPLE ↗</button></div>'}`;
   document.querySelector('#chat-count').textContent = `${String(conversations.length).padStart(2, '0')} CONVERSATIONS`;
   document.querySelector('#chat-badge').textContent = conversations.length;
   list?.querySelectorAll('[data-chat-id]').forEach((button) => button.addEventListener('click', () => openChat(matches.find((person) => person.id === button.dataset.chatId))));
+  list?.querySelectorAll('[data-delete-chat-id]').forEach((button) => button.addEventListener('click', () => {
+    const person = conversations.find((item) => item.id === button.dataset.deleteChatId);
+    if (!person || !window.confirm(`Remove your chat with ${person.name} from your inbox on this device? Saved messages and the other person's chat will remain unchanged.`)) return;
+    const hiddenIds = readHiddenChatIds();
+    hiddenIds.add(String(person.id));
+    if (!saveHiddenChatIds(hiddenIds)) { showToast('Could not remove this chat. Please try again.'); return; }
+    readChatIds.delete(person.id);
+    if (selectedChat?.id === person.id) {
+      selectedChat = null;
+      document.querySelector('#chat-window')?.setAttribute('hidden', '');
+      document.querySelector('#chat-list')?.removeAttribute('hidden');
+    }
+    renderChats();
+    showToast('Chat removed from your inbox on this device.');
+  }));
 };
 
 const loadChatMessages = async (person) => {
@@ -211,6 +254,7 @@ const appendRemoteMessage = (message) => {
   const otherId = message.sender_id === memberProfile.id ? message.recipient_id : message.sender_id;
   const messages = (chatMessages[otherId] ||= []);
   if (messages.some((item) => item.id === message.id)) return;
+  restoreChatForMe(otherId);
   messages.push({ id: message.id, createdAt: message.created_at, from: message.sender_id === memberProfile.id ? 'me' : 'them', text: message.body });
   if (message.sender_id !== memberProfile.id) readChatIds.delete(otherId);
   renderChats();
@@ -237,9 +281,13 @@ const openChat = (person) => {
   selectedChat = person;
   readChatIds.add(person.id);
   const list = document.querySelector('#chat-list'); const windowPanel = document.querySelector('#chat-window');
-  if (list) list.hidden = true; windowPanel?.removeAttribute('hidden');
+  const isSmallScreen = window.matchMedia('(max-width: 700px)').matches;
+  if (list) list.hidden = isSmallScreen;
+  windowPanel?.removeAttribute('hidden');
   const avatar = document.querySelector('#chat-avatar'); if (avatar) avatar.innerHTML = person.image ? `<img src="${person.image}" alt="${escapeHtml(person.name)}" />` : escapeHtml(initials(person.name));
   document.querySelector('#chat-name').textContent = person.name;
+  const chatRole = document.querySelector('#chat-role'); if (chatRole) chatRole.textContent = `${person.role || 'Brivia member'}${person.city ? ` · ${person.city}` : ''}`;
+  const chatStatus = document.querySelector('#chat-status'); if (chatStatus) chatStatus.textContent = 'MEMBER / PRIVATE THREAD';
   renderChats();
   if (!chatMessages[person.id]) chatMessages[person.id] = [];
   renderMessages();
@@ -248,7 +296,8 @@ const openChat = (person) => {
 
 const renderMessages = () => {
   const messages = document.querySelector('#chat-messages'); if (!messages || !selectedChat) return;
-  messages.innerHTML = (chatMessages[selectedChat.id] || []).map((message) => `<div class="message ${message.from === 'me' ? 'me' : 'them'}">${escapeHtml(message.text)}</div>`).join('');
+  const thread = chatMessages[selectedChat.id] || [];
+  messages.innerHTML = thread.length ? thread.map((message) => `<div class="message ${message.from === 'me' ? 'me' : 'them'}"><span>${escapeHtml(message.text)}</span><small>${escapeHtml(formatChatTime(message.createdAt))}</small></div>`).join('') : '<div class="chat-start-note"><strong>Start with context.</strong><span>A thoughtful first message makes a better introduction.</span></div>';
   messages.scrollTop = messages.scrollHeight;
 };
 
@@ -285,14 +334,18 @@ const renderProfile = () => {
   if (avatar) avatar.innerHTML = profile.photoUrl ? `<img src="${profile.photoUrl}" alt="${escapeHtml(profile.name)}" />` : escapeHtml(initials(profile.name));
   if (avatar && profile.photoName) avatar.title = profile.photoName;
   document.querySelector('#profile-email').textContent = profile.email || '—';
-  document.querySelector('#profile-login').textContent = profile.email || '—';
   document.querySelector('#profile-login-email').textContent = profile.email || '—';
-  document.querySelector('#profile-password').textContent = profile.loginPassword || '—';
   document.querySelector('#profile-phone').textContent = profile.phone || '—';
-  document.querySelector('#profile-experience').textContent = profile.experience || '—';
+  document.querySelector('#profile-city').textContent = profile.city || '—';
+  document.querySelector('#profile-state').textContent = profile.state || '—';
   const skills = (profile.skills || '').split(',').map((skill) => skill.trim()).filter(Boolean);
+  const lookingFor = (profile.lookingFor || '').split(',').map((item) => item.trim()).filter(Boolean);
   document.querySelector('#profile-skills').innerHTML = skills.length ? skills.map((skill) => `<span>${escapeHtml(skill)}</span>`).join('') : '<span>No skills added yet</span>';
-  document.querySelector('#profile-looking').textContent = profile.lookingFor || 'Add your intentions to find better connections.';
+  document.querySelector('#profile-looking').innerHTML = lookingFor.length ? lookingFor.map((item) => `<span>${escapeHtml(item)}</span>`).join('') : '<span>Add your intentions to find better connections.</span>';
+  document.querySelector('#profile-skill-count').textContent = String(skills.length).padStart(2, '0');
+  document.querySelector('#profile-looking-count').textContent = String(lookingFor.length).padStart(2, '0');
+  document.querySelector('#profile-experience-short').textContent = profile.experience ? profile.experience.replace('Student / just starting', 'STARTING').replace(' years', 'Y') : '—';
+  document.querySelector('#profile-summary').textContent = profile.experience ? `${profile.experience} and open to meaningful connections inside the club.` : 'Your profile is your first introduction inside the club.';
 };
 
 document.querySelectorAll('[data-nav]').forEach((button) => button.addEventListener('click', (event) => {
@@ -300,15 +353,61 @@ document.querySelectorAll('[data-nav]').forEach((button) => button.addEventListe
   if (button.tagName === 'A') return;
   setView(button.dataset.nav);
 }));
-window.addEventListener('popstate', routeFromUrl);
+window.addEventListener('popstate', () => {
+  if (appBackGuardActive) {
+    window.location.replace('/');
+    return;
+  }
+  routeFromUrl();
+});
 window.addEventListener('hashchange', routeFromUrl);
 document.querySelector('[data-action="pass"]')?.addEventListener('click', () => swipe('pass'));
 document.querySelector('[data-action="like"]')?.addEventListener('click', () => swipe('like'));
 document.querySelector('[data-action="full-info"]')?.addEventListener('click', () => { fillInfo(currentPerson); openOverlay('info-modal'); });
+const swipeCard = document.querySelector('#swipe-card');
+let swipePointer = null;
+const resetSwipeDrag = () => {
+  if (!swipeCard) return;
+  swipeCard.classList.remove('is-dragging');
+  swipeCard.style.transform = '';
+  swipeCard.style.opacity = '';
+};
+swipeCard?.addEventListener('pointerdown', (event) => {
+  if (event.button !== 0 || event.target.closest('button, a, input, textarea, select, [data-no-swipe]')) return;
+  if (!currentPerson || swipeCard.classList.contains('is-passing') || swipeCard.classList.contains('is-liking')) return;
+  swipePointer = { id: event.pointerId, startX: event.clientX, startY: event.clientY };
+  swipeCard.classList.add('is-dragging');
+  swipeCard.setPointerCapture(event.pointerId);
+  event.preventDefault();
+});
+swipeCard?.addEventListener('pointermove', (event) => {
+  if (!swipePointer || event.pointerId !== swipePointer.id) return;
+  const offsetX = event.clientX - swipePointer.startX;
+  const offsetY = event.clientY - swipePointer.startY;
+  if (event.pointerType !== 'mouse' && Math.abs(offsetY) > 12 && Math.abs(offsetY) > Math.abs(offsetX)) {
+    swipePointer = null;
+    resetSwipeDrag();
+    return;
+  }
+  const rotation = Math.max(-12, Math.min(12, offsetX / 18));
+  swipeCard.style.transform = `translate(${offsetX}px, ${offsetY * 0.12}px) rotate(${rotation}deg)`;
+  swipeCard.style.opacity = String(Math.max(.68, 1 - Math.abs(offsetX) / 500));
+});
+const finishSwipeDrag = (event, cancelled = false) => {
+  if (!swipePointer || event.pointerId !== swipePointer.id) return;
+  const offsetX = event.clientX - swipePointer.startX;
+  swipePointer = null;
+  resetSwipeDrag();
+  if (cancelled) return;
+  const swipeThreshold = Math.max(100, Math.min(150, swipeCard.clientWidth * .22));
+  if (Math.abs(offsetX) >= swipeThreshold) swipe(offsetX > 0 ? 'like' : 'pass');
+};
+swipeCard?.addEventListener('pointerup', (event) => finishSwipeDrag(event));
+swipeCard?.addEventListener('pointercancel', (event) => finishSwipeDrag(event, true));
 document.querySelectorAll('[data-close-overlay]').forEach((button) => button.addEventListener('click', closeOverlays));
 document.querySelectorAll('.filter-button').forEach((button) => button.addEventListener('click', () => { activeFilter = button.dataset.filter; document.querySelectorAll('.filter-button').forEach((item) => item.classList.toggle('is-active', item === button)); renderExplore(); }));
 document.querySelector('#explore-search-input')?.addEventListener('input', renderExplore);
-document.querySelector('#chat-back')?.addEventListener('click', () => { document.querySelector('#chat-window').setAttribute('hidden', ''); document.querySelector('#chat-list').removeAttribute('hidden'); renderChats(); });
+document.querySelector('#chat-back')?.addEventListener('click', () => { selectedChat = null; document.querySelector('#chat-window').setAttribute('hidden', ''); document.querySelector('#chat-list').removeAttribute('hidden'); renderChats(); });
 document.querySelector('#chat-form')?.addEventListener('submit', async (event) => {
   event.preventDefault();
   const input = document.querySelector('#chat-input');
@@ -336,12 +435,14 @@ document.querySelector('#pitch-form')?.addEventListener('submit', async (event) 
   showToast(`Pitch sent to ${target.name}.`);
   pitchPerson = null;
 });
-document.querySelector('[data-copy-profile="password"]')?.addEventListener('click', async (event) => { try { await navigator.clipboard.writeText(memberProfile.loginPassword || ''); event.currentTarget.textContent = 'COPIED'; window.setTimeout(() => { event.currentTarget.textContent = 'COPY PASSWORD'; }, 1600); } catch { showToast('Select the password to copy it.'); } });
 document.querySelector('#logout-button')?.addEventListener('click', async () => { if (supabase) await supabase.auth.signOut(); window.localStorage.removeItem('brivia-member-profile'); window.location.href = '/auth.html'; });
 document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeOverlays(); if (event.key === 'ArrowRight') swipe('like'); if (event.key === 'ArrowLeft') swipe('pass'); });
 
 const loadSupabaseCommunity = async () => {
-  if (!supabase) return;
+  if (!supabase) {
+    window.location.replace('/auth.html');
+    return;
+  }
   const { data: sessionData } = await supabase.auth.getSession();
   const session = sessionData?.session;
   if (!session) {
@@ -349,15 +450,20 @@ const loadSupabaseCommunity = async () => {
     return;
   }
   const { data: ownRow, error: ownError } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+  if (ownError) {
+    window.location.replace('/auth.html?profile-check=failed');
+    return;
+  }
+  if (!ownRow) {
+    window.location.replace('/auth.html?complete-profile=1');
+    return;
+  }
   const cachedProfile = JSON.parse(window.localStorage.getItem('brivia-member-profile') || 'null') || {};
   const isSameUser = cachedProfile.id === session.user.id;
-  memberProfile = isSameUser ? { id: session.user.id, loginPassword: cachedProfile.loginPassword || '' } : { id: session.user.id, loginPassword: '' };
-  if (!ownError && ownRow) memberProfile = { ...memberProfile, ...rowToProfile(ownRow), id: session.user.id };
-  else if (ownError) console.warn('Your profile could not load:', ownError.message);
+  memberProfile = isSameUser ? { ...cachedProfile, ...rowToProfile(ownRow), id: session.user.id } : { ...rowToProfile(ownRow), id: session.user.id };
+  delete memberProfile.loginPassword;
   memberProfile.email = session.user.email || memberProfile.email || '';
   if (!memberProfile.name || memberProfile.name === 'New Member') memberProfile.name = session.user.user_metadata?.name || 'New Member';
-  const { data: credentialRow, error: credentialError } = await loadLoginCredentials(session.user.id);
-  if (!credentialError && credentialRow?.login_password) memberProfile.loginPassword = credentialRow.login_password;
   window.localStorage.setItem('brivia-member-profile', JSON.stringify(memberProfile));
   const { data: matchRows, error: matchError } = await supabase.from('matches').select('user1_id,user2_id').or(`user1_id.eq.${session.user.id},user2_id.eq.${session.user.id}`);
   if (!matchError) remoteMatchIds = (matchRows || []).map((match) => match.user1_id === session.user.id ? match.user2_id : match.user1_id);
@@ -395,10 +501,22 @@ const loadSupabaseCommunity = async () => {
   renderProfile();
   subscribeToMessages();
   startMessageSync();
+  if (!appBackGuardActive) {
+    appBackGuardActive = true;
+    window.history.pushState(
+      { ...(window.history.state || {}), briviaAppBackGuard: true },
+      '',
+      window.location.href
+    );
+  }
+  document.body.classList.remove('app-auth-pending');
 };
 
 renderHome();
 renderExplore();
 renderProfile();
 routeFromUrl();
-loadSupabaseCommunity().catch((error) => console.warn('Supabase data could not load:', error.message));
+loadSupabaseCommunity().catch((error) => {
+  console.warn('Supabase data could not load:', error.message);
+  window.location.replace('/auth.html?profile-check=failed');
+});

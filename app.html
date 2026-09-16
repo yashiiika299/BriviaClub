@@ -7,7 +7,7 @@
     <title>Brivia Club · Discover your kind</title>
     <style>.app-nav-button{text-decoration:none}.app-view[hidden]{display:none!important}</style>
   </head>
-  <body class="app-body">
+  <body class="app-body app-auth-pending">
     <div class="app-wrap">
       <header class="app-topbar"><a class="app-brand" href="/"><span class="app-brand-prefix">the</span><strong>Brivia Club</strong></a><button class="app-avatar-button" data-nav="profile" aria-label="Open profile">YU</button></header>
       <main class="app-main">
@@ -15,7 +15,7 @@
           <div class="view-topline"><span>DISCOVERY / 001</span><span id="queue-count">01 / 06</span></div>
           <div class="home-heading"><p class="app-eyebrow">PEOPLE WORTH KNOWING</p><h1>Meet your<br /><em>kind.</em></h1><p>Swipe with intention. Every yes opens a possibility.</p></div>
           <div class="swipe-card" id="swipe-card">
-            <div class="swipe-card-image"><img id="swipe-image" src="./assets/bala.webp" alt="Member profile" /><div class="swipe-card-shade"></div><span class="member-active"><i></i> ACTIVE</span><span class="member-distance">2.3 KM</span></div>
+            <div class="swipe-card-image"><img id="swipe-image" src="./assets/bala.webp" alt="Member profile" /><div class="swipe-card-shade"></div><span class="member-active"><i></i> ACTIVE</span></div>
             <div class="swipe-card-info"><div class="member-name-row"><h2 id="swipe-name">Bala</h2><span id="swipe-age">24</span><span class="verified-mark">✓</span></div><p id="swipe-role">Product designer</p><p id="swipe-location">Bengaluru, India</p><div class="member-tags" id="swipe-tags"></div><button class="view-info-button" data-action="full-info">VIEW FULL INFO <span>↗</span></button></div>
           </div>
           <div class="swipe-actions"><button class="swipe-action swipe-pass" data-action="pass" aria-label="Pass">×</button><button class="swipe-action swipe-like" data-action="like" aria-label="Connect">✓</button></div>
@@ -23,23 +23,34 @@
         </section>
 
         <section class="app-view" data-view="explore" hidden>
-          <div class="view-topline"><span>EXPLORE / COMMUNITY</span><span id="explore-count">06 PEOPLE</span></div><div class="view-heading"><p class="app-eyebrow">FIND YOUR PEOPLE</p><h1>Everyone<br /><em>has a story.</em></h1></div>
+          <div class="view-topline"><span>EXPLORE / COMMUNITY</span><span id="explore-count">06 PEOPLE</span></div><div class="view-heading"><p class="app-eyebrow">THE WIDER ROOM</p><h1>Look closer.<br /><em>Meet your match.</em></h1></div>
           <div class="explore-search"><span>⌕</span><input id="explore-search-input" type="search" placeholder="Search people, skills, cities..." /></div>
           <div class="explore-filters" role="group" aria-label="Filter people"><button class="filter-button is-active" data-filter="all">ALL</button><button class="filter-button" data-filter="design">DESIGN</button><button class="filter-button" data-filter="ai">AI / TECH</button><button class="filter-button" data-filter="founder">FOUNDERS</button><button class="filter-button" data-filter="study">STUDY</button><button class="filter-button" data-filter="travel">TRAVEL</button></div>
           <div class="explore-list" id="explore-list"></div>
         </section>
 
         <section class="app-view" data-view="chat" hidden>
-          <div class="view-topline"><span>MESSAGES / PRIVATE</span><span id="chat-count">02 ACTIVE</span></div><div class="view-heading"><p class="app-eyebrow">YOUR CONNECTIONS</p><h1>Good things<br /><em>start small.</em></h1></div>
-          <div class="chat-layout"><div class="chat-list" id="chat-list"></div><div class="chat-window" id="chat-window" hidden><div class="chat-window-head"><button class="chat-back" id="chat-back">←</button><div class="mini-avatar" id="chat-avatar">P</div><div><strong id="chat-name">Priya</strong><span>ONLINE NOW</span></div></div><div class="chat-messages" id="chat-messages"></div><form class="chat-compose" id="chat-form"><input id="chat-input" placeholder="Write a message..." autocomplete="off" /><button type="submit">→</button></form></div></div>
+          <div class="view-topline"><span>INBOX / PRIVATE</span><span id="chat-count">02 ACTIVE</span></div><div class="view-heading"><p class="app-eyebrow">PRIVATE CONVERSATIONS</p><h1>Keep the thread<br /><em>meaningful.</em></h1></div>
+          <div class="chat-layout"><div class="chat-list" id="chat-list"></div><div class="chat-window" id="chat-window" hidden><div class="chat-window-head"><button class="chat-back" id="chat-back">←</button><div class="mini-avatar" id="chat-avatar">P</div><div><strong id="chat-name">Priya</strong><span id="chat-status">MEMBER / PRIVATE THREAD</span><small id="chat-role">Brivia member</small></div></div><div class="chat-messages" id="chat-messages"></div><form class="chat-compose" id="chat-form"><input id="chat-input" placeholder="Write a thoughtful message..." autocomplete="off" /><button type="submit">→</button></form></div><aside class="inbox-empty-window"><span class="inbox-empty-mark">✦</span><p>YOUR PRIVATE ROOM</p><h2>Choose a thread<br /><em>to begin.</em></h2><span>Good conversations start with context, curiosity, and a little intention.</span><button class="inbox-empty-action" type="button" data-nav="explore">EXPLORE PEOPLE <b>↗</b></button></aside></div>
         </section>
 
         <section class="app-view" data-view="profile" hidden>
-          <div class="view-topline"><span>MY PROFILE / PRIVATE</span><button class="logout-button" id="logout-button">LOG OUT ↗</button></div><div class="profile-hero"><div class="profile-avatar" id="profile-avatar">YU</div><div><p class="app-eyebrow">MEMBER PROFILE</p><h1 id="profile-name">New Member</h1><p id="profile-location">Your city, your state</p></div></div>
-          <div class="profile-section"><div class="profile-section-heading"><span>ABOUT YOU</span><small>VISIBLE TO MEMBERS</small></div><div class="profile-data-grid"><div><span>EMAIL</span><strong id="profile-email">—</strong></div><div><span>EXPERIENCE</span><strong id="profile-experience">—</strong></div><div><span>PHONE</span><strong id="profile-phone">—</strong></div><div><span>LOGIN ID</span><strong id="profile-login">—</strong></div></div></div>
-          <div class="profile-section"><div class="profile-section-heading"><span>SKILLS &amp; INTERESTS</span></div><div class="profile-pills" id="profile-skills"></div></div>
-          <div class="profile-section"><div class="profile-section-heading"><span>LOOKING FOR</span></div><p class="profile-looking" id="profile-looking">Add your intentions to find better connections.</p></div>
-          <div class="profile-login-card"><div><span>YOUR LOGIN DETAILS</span><strong id="profile-login-email">—</strong><code id="profile-password">—</code></div><button data-copy-profile="password">COPY PASSWORD</button></div>
+          <div class="view-topline"><span>MY PROFILE / PRIVATE</span><button class="logout-button" id="logout-button">LOG OUT ↗</button></div>
+          <div class="profile-hero">
+            <div class="profile-hero-copy"><p class="app-eyebrow">YOUR PLACE IN THE CLUB</p><h1 id="profile-name">New Member</h1><p id="profile-location">Your city, your state</p><span class="profile-status"><i></i> MEMBER PROFILE</span></div>
+            <div class="profile-avatar" id="profile-avatar">YU</div>
+          </div>
+          <div class="profile-dashboard">
+            <div class="profile-dashboard-top"><div><p class="profile-kicker">THE STORY BEHIND THE PROFILE</p><h2>Show up as<br /><em>yourself.</em></h2></div><span class="profile-mark">BC / 01</span></div>
+            <p class="profile-summary" id="profile-summary">Your profile is your first introduction inside the club.</p>
+            <div class="profile-quick-stats"><div><strong id="profile-skill-count">00</strong><span>SKILLS / INTERESTS</span></div><div><strong id="profile-looking-count">00</strong><span>OPEN TO</span></div><div><strong id="profile-experience-short">—</strong><span>EXPERIENCE</span></div></div>
+          </div>
+          <div class="profile-content-grid">
+            <div class="profile-section profile-details-card"><div class="profile-section-heading"><span>YOUR DETAILS</span><small>VISIBLE TO MEMBERS</small></div><div class="profile-data-grid"><div><span>EMAIL</span><strong id="profile-email">—</strong></div><div><span>PHONE</span><strong id="profile-phone">—</strong></div><div><span>CITY</span><strong id="profile-city">—</strong></div><div><span>STATE</span><strong id="profile-state">—</strong></div></div></div>
+            <div class="profile-section profile-skills-card"><div class="profile-section-heading"><span>SKILLS &amp; INTERESTS</span><small>YOUR EDGE</small></div><div class="profile-pills" id="profile-skills"></div></div>
+            <div class="profile-section profile-looking-card"><div class="profile-section-heading"><span>LOOKING FOR</span><small>YOUR INTENTION</small></div><p class="profile-looking" id="profile-looking">Add your intentions to find better connections.</p></div>
+          </div>
+          <div class="profile-login-card"><div><span>YOUR LOGIN DETAILS</span><strong id="profile-login-email">—</strong></div></div>
         </section>
       </main>
       <nav class="app-bottom-nav" aria-label="Member navigation"><a class="app-nav-button is-active" href="/app.html?view=home" data-nav="home"><span>⌂</span>HOME</a><a class="app-nav-button" href="/app.html?view=explore" data-nav="explore"><span>◎</span>EXPLORE</a><a class="app-nav-button" href="/app.html?view=chat" data-nav="chat"><span>◌</span>CHAT<i id="chat-badge">0</i></a><a class="app-nav-button" href="/app.html?view=profile" data-nav="profile"><span>◉</span>PROFILE</a></nav>
@@ -65,9 +76,16 @@
           if (!item) return;
           const targetView = item.dataset.nav;
           if (!validViews.includes(targetView)) return;
-          if (item.tagName === 'A') return;
           event.preventDefault();
           showView(targetView);
+          const nextUrl = new URL(window.location.href);
+          if (targetView === 'home') nextUrl.searchParams.delete('view');
+          else nextUrl.searchParams.set('view', targetView);
+          window.history.replaceState(
+            { ...(window.history.state || {}), appView: targetView },
+            '',
+            nextUrl.pathname + nextUrl.search + nextUrl.hash
+          );
         });
         showView(readView());
       })();
