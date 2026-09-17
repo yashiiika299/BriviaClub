@@ -27,6 +27,15 @@ html{scroll-snap-type:none}
 @media(max-width:700px){.brand-wordmark{font-size:43px;letter-spacing:-1.5px}}
 .hero{height:55vh;min-height:360px}
 @media(max-width:700px){.hero{height:42vh;min-height:280px}}
+.hero{height:100svh;min-height:100vh;background:#171616;isolation:isolate}
+.hero-video{position:absolute;z-index:0;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center}
+.hero-video-overlay{position:absolute;z-index:1;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.16),rgba(0,0,0,.08) 45%,rgba(0,0,0,.38));pointer-events:none}
+.hero-copy{position:relative;z-index:2}
+.hero .brand-wordmark{color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.28)}
+.hero .brand-wordmark strong{color:#fff}
+.hero-details{z-index:2;color:#fff}
+.hero-details .name-link{color:#fff;border-bottom-color:rgba(255,255,255,.7)}
+.hero-details .role{color:rgba(255,255,255,.74)}
 .orbit-section{min-height:clamp(420px,64vh,520px);display:grid;place-items:center;position:relative;overflow:hidden;background:#f8f6ef}
 .orbit-stack{display:flex;flex-direction:column;align-items:center;gap:0}
 .orbit-reveal{width:min(36vw,420px);aspect-ratio:1;opacity:0;clip-path:circle(0% at 50% 50%);transform:scale(.35);transition:opacity .25s ease,transform .7s cubic-bezier(.2,.8,.2,1),clip-path .7s cubic-bezier(.2,.8,.2,1)}

@@ -2127,7 +2127,7 @@
   grid-area: phone !important;
   min-width: 0;
   min-height: 0;
-  background: #f3e9df url('./assets/vintage-phone.png') left center / auto 100% no-repeat;
+  background: #f3e9df url('./assets/vintage-phone.png') clamp(96px, 10.5vw, 202px) center / auto 100% no-repeat;
 }
 
 .auth-shell:has(.auth-login.is-active) .auth-panel {
@@ -2231,7 +2231,7 @@
   }
 
   .auth-shell:has(.auth-login.is-active) .auth-login h1 {
-    font-size: 46px !important;
+    font-size: 58px !important;
   }
 
   .auth-shell:has(.auth-login.is-active) .auth-login {
@@ -2252,11 +2252,178 @@
     width: min(405px, 29vw) !important;
   }
 
+  .auth-shell:has(.auth-login.is-active) .auth-login .auth-divider,
+  .auth-shell:has(.auth-login.is-active) .auth-login .auth-socials {
+    width: min(100%, 29vw);
+  }
+
   .auth-shell:has(.auth-login.is-active) .auth-submit {
     min-height: 32px;
   }
 
   .auth-shell:has(.auth-login.is-active) .auth-panel::before {
     right: 100px;
+  }
+}
+
+/* Move the complete login section together in the reference composition. */
+.auth-shell:has(.auth-login.is-active) .auth-login {
+  position: relative;
+  top: 54px;
+}
+
+.auth-shell:has(.auth-login.is-active) .auth-login h1 {
+  font-family: Georgia, 'Times New Roman', serif !important;
+  font-weight: 400;
+  line-height: .95;
+  letter-spacing: -.045em;
+  font-style: normal;
+  white-space: nowrap;
+  display: block;
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+  position: static;
+  top: auto;
+  transform: none !important;
+}
+
+/* Keep every right-side element on one shared centre line. */
+.auth-shell:has(.auth-login.is-active) .auth-login .auth-divider,
+.auth-shell:has(.auth-login.is-active) .auth-login .auth-socials {
+  width: min(100%, 405px);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* This must come after the texture layer's important position declaration. */
+.auth-shell:has(.auth-login.is-active) .auth-phone {
+  background-position: clamp(120px, 10.5vw, 202px) center, 0 0, 0 0 !important;
+}
+
+/* Keep the full-screen login composition clean without a visible inner bar. */
+.auth-shell:has(.auth-login.is-active) .auth-panel {
+  scrollbar-width: none;
+}
+
+.auth-shell:has(.auth-login.is-active) .auth-panel::-webkit-scrollbar {
+  display: none;
+  width: 0;
+}
+
+/* Make the lower-right editorial note readable at normal viewing size. */
+.auth-shell:has(.auth-login.is-active) .auth-panel::before {
+  width: 190px;
+  font-size: 14px;
+  line-height: 1.5;
+  content: '“Find your kind.\A Build what’s next.”';
+}
+
+@media (min-width: 901px) {
+  .auth-shell:has(.auth-login.is-active) .auth-login .auth-intro {
+    width: max-content;
+    max-width: none;
+    white-space: nowrap;
+  }
+}
+
+/* Final desktop fit: keep the upgraded heading fully inside the right panel. */
+.auth-shell:has(.auth-login.is-active) .auth-login {
+  width: min(100%, 760px) !important;
+}
+
+.auth-shell:has(.auth-login.is-active) .auth-login h1 {
+  font-size: clamp(50px, 4vw, 76px) !important;
+  letter-spacing: -.055em;
+  white-space: nowrap;
+}
+
+.auth-shell:has(.auth-login.is-active) .auth-panel::before {
+  right: clamp(28px, 4vw, 64px) !important;
+  width: 190px;
+  max-width: calc(100% - 56px);
+}
+
+/* Center the complete right-side login group lower in the viewport. */
+.auth-shell:has(.auth-login.is-active) .auth-login {
+  top: 140px !important;
+}
+
+/* Improve readability of the top-right account prompt. */
+.auth-shell:has(.auth-login.is-active) .auth-top-signup {
+  font-size: 11px !important;
+  letter-spacing: .13em;
+}
+
+.auth-shell:has(.auth-login.is-active) .auth-top-signup b {
+  padding: 10px 20px;
+  font-size: 11px !important;
+  letter-spacing: .11em;
+}
+
+.auth-shell:has(.auth-login.is-active) .auth-top-signup {
+  position: relative;
+  right: -95px;
+}
+
+/* Upgrade and enlarge the bottom-right brand quote. */
+.auth-shell:has(.auth-login.is-active) .auth-panel::before {
+  width: 220px;
+  font-size: 17px !important;
+  line-height: 1.4;
+  content: '\201CMeet your people.\A Build something real.\201D';
+}
+
+.auth-shell:has(.auth-login.is-active) .auth-panel::before {
+  right: clamp(14px, 2.5vw, 42px) !important;
+  font-family: 'Instrument Sans', Arial, sans-serif !important;
+  font-size: 19px !important;
+  font-style: normal !important;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+/* Keep the create-account view consistent with the polished login view. */
+@media (min-width: 901px) {
+  .auth-shell:has(.auth-signup.is-active) .auth-top-signup {
+    position: relative;
+    right: -95px;
+    font-size: 11px !important;
+    letter-spacing: .13em;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-top-signup b {
+    padding: 10px 20px;
+    font-size: 11px !important;
+    letter-spacing: .11em;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-signup {
+    width: min(100%, 600px) !important;
+    margin: 38px auto 0;
+    text-align: center;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-signup h1 {
+    font-size: clamp(46px, 4.5vw, 64px) !important;
+    line-height: .94;
+    text-align: center;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-signup .auth-intro {
+    max-width: 500px;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-signup-form {
+    width: min(100%, 560px);
+    margin-right: auto;
+    margin-left: auto;
+    text-align: left;
   }
 }
