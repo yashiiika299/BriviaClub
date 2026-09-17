@@ -9,6 +9,10 @@ import './deep-wine-theme.css';
 import './inbox-linkedin.css';
 import './explore-polish.css';
 import './member-polish.css';
+import './card-reference.css';
+import './chat-reference.css';
+import './chat-sidebar-fix.css';
+import './app-navigation.css';
 import { supabase, rowToProfile, saveProfile } from './supabase.js';
 
 document.body.classList.add('app-auth-pending');
@@ -62,6 +66,8 @@ const showToast = (message) => {
 };
 
 const setView = (view) => {
+  document.body.dataset.appView = view;
+  document.body.classList.toggle('app-subview', view !== 'home');
   document.querySelectorAll('[data-view]').forEach((section) => {
     const isActive = section.dataset.view === view;
     section.hidden = !isActive;
@@ -76,7 +82,7 @@ const setView = (view) => {
 
 const validViews = ['home', 'explore', 'chat', 'profile'];
 const routeFromUrl = () => {
-  const view = new URLSearchParams(window.location.search).get('view') || window.location.hash.slice(1);
+  const view = new URLSearchParams(window.location.search).get('view') || window.location.hash.slice(1) || 'home';
   if (validViews.includes(view)) setView(view);
 };
 
@@ -108,10 +114,16 @@ const renderHome = () => {
   emptyState?.setAttribute('hidden', '');
   const image = document.querySelector('#swipe-image');
   if (image) { image.src = currentPerson.image || ''; image.alt = `${currentPerson.name} profile`; }
+  if (card) card.style.setProperty('--card-avatar-image', `url("${currentPerson.image || ''}")`);
   const name = document.querySelector('#swipe-name'); if (name) name.textContent = currentPerson.name;
-  const age = document.querySelector('#swipe-age'); if (age) age.textContent = currentPerson.age;
+  const handle = document.querySelector('#swipe-location'); if (handle) handle.textContent = `@${currentPerson.name.toLowerCase().replace(/[^a-z0-9]+/g, '')}`;
+  const cardLabel = document.querySelector('#swipe-card-label');
+  if (cardLabel) {
+    const profileText = `${currentPerson.role || ''} ${currentPerson.lookingFor || ''} ${(currentPerson.tags || []).join(' ')}`.toLowerCase();
+    cardLabel.textContent = /engineer|developer|ai|tech|system|build/.test(profileText) ? 'BUILDING' : /marketing|content|brand|impact|startup/.test(profileText) ? 'IDEAS TO IMPACT' : 'CREATIVE SOUL';
+  }
   const role = document.querySelector('#swipe-role'); if (role) role.textContent = currentPerson.role;
-  const location = document.querySelector('#swipe-location'); if (location) location.textContent = currentPerson.city || currentPerson.state || '';
+  const location = document.querySelector('#swipe-location'); if (location) location.textContent = `@${currentPerson.name.toLowerCase().replace(/[^a-z0-9]+/g, '')}`;
   const tags = document.querySelector('#swipe-tags'); if (tags) tags.innerHTML = currentPerson.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('');
   const count = document.querySelector('#queue-count'); if (count) count.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(people.length).padStart(2, '0')}`;
   card?.classList.remove('is-passing', 'is-liking');
@@ -159,6 +171,15 @@ const swipe = (type) => {
   window.setTimeout(() => { currentIndex += 1; currentPerson = people[currentIndex] || people[0]; if (currentIndex >= people.length) currentIndex = 0; renderHome(); }, 280);
 };
 
+const exploreCoverImages = [
+  './assets/chat-reference-room.png',
+  './assets/macbook-roses-cream.png',
+  './assets/macbook-roses-back.png',
+  './assets/guitar-premium.png',
+  './assets/badminton-premium-no-shuttle.png',
+  './assets/sites.jpg',
+];
+
 const renderExplore = () => {
   const query = (document.querySelector('#explore-search-input')?.value || '').trim().toLowerCase();
   const list = document.querySelector('#explore-list');
@@ -167,9 +188,11 @@ const renderExplore = () => {
     const haystack = `${person.name} ${person.role} ${person.city} ${person.state || ''} ${person.experience || ''} ${person.email || ''} ${person.phone || ''} ${person.skills || ''} ${person.lookingFor || ''} ${person.tags.join(' ')}`.toLowerCase();
     return matchesFilter && haystack.includes(query);
   });
-  if (list) list.innerHTML = filtered.length ? filtered.map((person) => {
+  if (list) list.innerHTML = filtered.length ? filtered.map((person, index) => {
     const intent = person.lookingFor?.split(',')[0]?.trim() || 'Open to intentional connections';
-    return `<article class="explore-row"><div class="explore-row-avatar">${renderAvatar(person)}</div><div class="explore-row-copy"><div class="explore-row-name"><strong>${escapeHtml(person.name)}, ${person.age}</strong><span class="explore-row-verified">✓</span></div><span class="explore-row-role">${escapeHtml(person.role)} · ${escapeHtml(person.city)}</span><p class="explore-row-intent">${escapeHtml(intent)}</p><div class="explore-row-tags">${person.tags.slice(0, 2).map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div></div><button class="row-action" data-profile-id="${person.id}"><span>VIEW PROFILE</span><b>↗</b></button></article>`;
+    const cover = exploreCoverImages[index % exploreCoverImages.length];
+    const coverLabel = person.tags?.[0] || 'CREATIVE SOUL';
+    return `<article class="explore-card"><div class="explore-card-media"><img class="explore-card-cover" src="${cover}" alt="" loading="lazy" /><div class="explore-card-topline"><span>${escapeHtml(coverLabel)}</span><b aria-hidden="true">•••</b></div><div class="explore-card-avatar">${renderAvatar(person)}</div></div><div class="explore-card-body"><div class="explore-card-name"><h2>${escapeHtml(person.name)}</h2><span>${person.age ? escapeHtml(person.age) : ''}</span><i class="explore-row-verified">✓</i></div><p class="explore-card-meta">${escapeHtml(person.role)} <em>·</em> ${escapeHtml(person.city)}</p><p class="explore-card-intent">${escapeHtml(intent)}</p><div class="explore-card-tags">${person.tags.slice(0, 3).map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div><button class="row-action explore-card-action" data-profile-id="${person.id}" aria-label="View ${escapeHtml(person.name)} profile"><span class="sr-only">VIEW PROFILE</span><b>↗</b></button></div></article>`;
   }).join('') : '<p class="empty-state">No people match that search yet. Try another filter.</p>';
   document.querySelector('#explore-count').textContent = `${String(filtered.length).padStart(2, '0')} PEOPLE`;
   list?.querySelectorAll('[data-profile-id]').forEach((button) => button.addEventListener('click', () => { const person = people.find((item) => item.id === button.dataset.profileId); if (person) { fillInfo(person); openOverlay('info-modal'); } }));
@@ -190,6 +213,10 @@ const ensureInboxControls = () => {
   layout.before(toolbar);
   toolbar.querySelector('#chat-search')?.addEventListener('input', (event) => { chatSearchQuery = event.target.value; renderChats(); });
   toolbar.querySelectorAll('[data-chat-filter]').forEach((button) => button.addEventListener('click', () => { activeChatFilter = button.dataset.chatFilter; toolbar.querySelectorAll('[data-chat-filter]').forEach((item) => item.classList.toggle('is-active', item === button)); renderChats(); }));
+  const emptyRoom = layout.querySelector('.inbox-empty-window');
+  if (emptyRoom) {
+    emptyRoom.innerHTML = '<div class="empty-chat-head"><div class="empty-chat-avatar">✦</div><div><strong>Brivia AI</strong><span>Online</span></div><b>•••</b></div><div class="empty-chat-messages"><div class="empty-chat-line empty-chat-line-them"><div class="empty-chat-avatar">✦</div><div class="empty-chat-bubble">Hi! I’m Brivia AI.<br />How can I help you today?<small>1:40 AM</small></div></div><div class="empty-chat-line empty-chat-line-them empty-chat-typing"><div class="empty-chat-avatar">✦</div><div class="empty-chat-bubble">•••</div></div><div class="empty-chat-line empty-chat-line-me"><div class="empty-chat-bubble">I’m looking for a co-founder<small>1:41 AM&nbsp; ✓✓</small></div></div></div><div class="empty-chat-compose"><span>⌕</span><span>Message Brivia AI...</span><small>Press Enter to send</small><b>→</b></div>';
+  }
 };
 
 const formatChatTime = (value) => {
@@ -211,11 +238,16 @@ const renderChats = () => {
     return (!query || haystack.includes(query)) && (activeChatFilter !== 'unread' || unread);
   });
   const list = document.querySelector('#chat-list');
-  if (list) list.innerHTML = `<div class="inbox-panel-head"><div><strong>YOUR THREADS</strong><span>Private conversations</span></div><b>${conversations.length}</b></div>${matches.length ? matches.map((person) => {
+  const referenceRows = '';
+  if (list) list.innerHTML = `<div class="inbox-panel-head"><div><strong>YOUR THREADS</strong><span>Private conversations</span></div><b>${conversations.length}</b></div>${referenceRows}${matches.length ? matches.map((person) => {
     const last = chatMessages[person.id]?.at(-1);
     const unread = last?.from === 'them' && !readChatIds.has(person.id);
     return `<div class="chat-row${unread ? ' is-unread' : ''}${selectedChat?.id === person.id ? ' is-selected' : ''}"><button class="chat-row-open" type="button" data-chat-id="${escapeHtml(person.id)}">${renderAvatar(person)}<span class="chat-row-copy"><strong>${escapeHtml(person.name)}</strong><span>${escapeHtml(last?.text || 'Start a conversation')}</span></span><span class="chat-row-meta"><time>${escapeHtml(formatChatTime(last?.createdAt))}</time>${unread ? '<b>1</b>' : ''}</span></button><button class="chat-delete" type="button" data-delete-chat-id="${escapeHtml(person.id)}" aria-label="Delete chat with ${escapeHtml(person.name)}" title="Delete chat"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 6h11M8 3.5h4M6.5 6l.6 10h5.8l.6-10M8.5 8.5v5M11.5 8.5v5"/></svg></button></div>`;
   }).join('') : '<div class="inbox-empty"><strong>No threads found</strong><span>Send a pitch from Explore to open a private conversation.</span><button type="button" class="inbox-empty-action" data-nav="explore">EXPLORE PEOPLE ↗</button></div>'}`;
+  if (list) {
+    const inboxMarkup = list.innerHTML;
+    list.innerHTML = `<div class="chat-sidebar-brand"><strong>BRIVIA SOCIETY</strong><span></span><small><i>PEOPLE</i><i>IDEAS</i><i>POSSIBILITIES</i></small></div><div class="chat-inbox-scroll">${inboxMarkup}</div>`;
+  }
   document.querySelector('#chat-count').textContent = `${String(conversations.length).padStart(2, '0')} CONVERSATIONS`;
   document.querySelector('#chat-badge').textContent = conversations.length;
   list?.querySelectorAll('[data-chat-id]').forEach((button) => button.addEventListener('click', () => openChat(matches.find((person) => person.id === button.dataset.chatId))));
@@ -354,7 +386,9 @@ document.querySelectorAll('[data-nav]').forEach((button) => button.addEventListe
   setView(button.dataset.nav);
 }));
 window.addEventListener('popstate', () => {
-  if (appBackGuardActive) {
+  const state = window.history.state || {};
+  const hasView = new URLSearchParams(window.location.search).has('view') || Boolean(window.location.hash.slice(1));
+  if (appBackGuardActive && !state.briviaAppBackGuard && !hasView) {
     window.location.replace('/');
     return;
   }

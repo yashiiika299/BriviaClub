@@ -9,6 +9,100 @@ import { supabase, supabaseReady, saveProfile, compressedImageDataUrl } from './
 
 const introBurst = document.querySelector('#intro-burst');
 const introSkip = introBurst?.querySelector('.intro-skip');
+const introWordmark = introBurst?.querySelector('.glitch-intro-wordmark');
+const introParticleField = introBurst?.querySelector('.intro-particle-field');
+const introParticleCanvas = introParticleField?.querySelector('.intro-particle-canvas');
+if (introParticleCanvas) {
+  const particleContext = introParticleCanvas.getContext('2d');
+  let particleWidth = 0;
+  let particleHeight = 0;
+  let particles = [];
+  const particleStart = performance.now();
+
+  const buildParticleField = () => {
+    const nextParticles = [];
+    const count = particleWidth < 700 ? 520 : 1200;
+    for (let index = 0; index < count; index += 1) {
+      const fromLeft = index % 2 === 0;
+      const wave = index % 5;
+      const centerX = particleWidth * (.29 + Math.random() * .42);
+      const centerY = particleHeight * (.39 + Math.random() * .22);
+      nextParticles.push({
+        x: centerX,
+        y: centerY,
+        fromX: fromLeft ? -particleWidth * (.08 + Math.random() * .52) : particleWidth * (1.08 + Math.random() * .52),
+        fromY: centerY + (Math.random() - .5) * particleHeight * .52,
+        size: 1 + Math.random() * 2.3,
+        alpha: .34 + Math.random() * .66,
+        color: index % 19 === 0 ? '#9b321b' : index % 7 === 0 ? '#f3c2cc' : '#fffaf7',
+        delay: wave * .08 + Math.random() * .22,
+        duration: 1.05 + wave * .12 + Math.random() * .3,
+        drift: (Math.random() - .5) * 14,
+        direction: fromLeft ? 1 : -1,
+      });
+    }
+    particles = nextParticles;
+  };
+
+  const resizeParticleCanvas = () => {
+    const rect = introParticleField.getBoundingClientRect();
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    particleWidth = Math.max(1, rect.width);
+    particleHeight = Math.max(1, rect.height);
+    introParticleCanvas.width = Math.floor(particleWidth * ratio);
+    introParticleCanvas.height = Math.floor(particleHeight * ratio);
+    introParticleCanvas.style.width = `${particleWidth}px`;
+    introParticleCanvas.style.height = `${particleHeight}px`;
+    particleContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+    buildParticleField();
+  };
+
+  const drawParticleIntro = (now) => {
+    if (!document.body.contains(introParticleCanvas)) return;
+    const elapsed = (now - particleStart) / 1000;
+    particleContext.clearRect(0, 0, particleWidth, particleHeight);
+    particleContext.lineCap = 'round';
+    particles.forEach((particle) => {
+      const gather = Math.min(1, Math.max(0, (elapsed - particle.delay) / particle.duration));
+      const eased = gather * gather * (3 - 2 * gather);
+      let x = particle.fromX + (particle.x - particle.fromX) * eased;
+      let y = particle.fromY + (particle.y - particle.fromY) * eased;
+      let opacity = particle.alpha * Math.min(1, gather * 4);
+      if (elapsed > 3.35) {
+        const burst = Math.min(1, (elapsed - 3.35) / 1.05);
+        x = particle.x + (particle.x - particleWidth / 2) * burst * .52;
+        y = particle.y + (particle.y - particleHeight / 2) * burst * .52 + particle.drift * burst;
+        opacity *= 1 - burst;
+      }
+      const trailStrength = Math.min(1, gather * 2.2) * (1 - Math.min(1, Math.max(0, (gather - .78) * 4)));
+      if (trailStrength > 0 && opacity > 0) {
+        particleContext.save();
+        particleContext.globalAlpha = opacity * .28 * trailStrength;
+        particleContext.strokeStyle = particle.color;
+        particleContext.lineWidth = Math.max(.6, particle.size * .56);
+        particleContext.shadowColor = particle.color;
+        particleContext.shadowBlur = 7;
+        particleContext.beginPath();
+        particleContext.moveTo(x - particle.direction * (16 + particle.size * 8) * trailStrength, y);
+        particleContext.lineTo(x, y);
+        particleContext.stroke();
+        particleContext.restore();
+      }
+      particleContext.save();
+      particleContext.globalAlpha = opacity;
+      particleContext.fillStyle = particle.color;
+      particleContext.shadowColor = particle.color;
+      particleContext.shadowBlur = 7;
+      particleContext.fillRect(x, y, particle.size, Math.max(1, particle.size * .58));
+      particleContext.restore();
+    });
+    if (elapsed < 4.45) window.requestAnimationFrame(drawParticleIntro);
+  };
+
+  resizeParticleCanvas();
+  window.addEventListener('resize', resizeParticleCanvas, { passive: true });
+  window.requestAnimationFrame(drawParticleIntro);
+}
 let skipIntroOnce = false;
 try {
   skipIntroOnce = window.sessionStorage.getItem('brivia-skip-intro-once') === 'true';
@@ -19,13 +113,14 @@ if (introBurst && skipIntroOnce) {
 }
 if (introBurst && !skipIntroOnce) {
   document.body.classList.add('intro-active');
+  window.setTimeout(() => introWordmark?.classList.add('is-revealed'), 1320);
   const finishIntro = () => {
     document.body.classList.remove('intro-active');
     introBurst.classList.add('is-skipped');
     window.setTimeout(() => introBurst.remove(), 500);
   };
   introSkip?.addEventListener('click', finishIntro);
-  window.setTimeout(finishIntro, 2800);
+  window.setTimeout(finishIntro, 4200);
 }
 
 const cursor = document.querySelector('.cursor');

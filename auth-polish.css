@@ -2427,3 +2427,115 @@
     text-align: left;
   }
 }
+
+/* Replace the legacy signup composition with the same full-screen auth frame. */
+@media (min-width: 901px) {
+  .auth-shell:has(.auth-signup.is-active) {
+    display: grid !important;
+    grid-template-columns: minmax(270px, 32%) minmax(0, 68%) !important;
+    grid-template-rows: 1fr !important;
+    grid-template-areas: 'phone panel' !important;
+    width: 100% !important;
+    height: 100svh !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #f3e9df !important;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-story,
+  .auth-shell:has(.auth-signup.is-active) .auth-visual,
+  .auth-shell:has(.auth-signup.is-active) .auth-envelope-transition {
+    display: none !important;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-phone {
+    display: block !important;
+    grid-area: phone !important;
+    min-width: 0;
+    min-height: 0;
+    background: #f3e9df url('./assets/vintage-phone.png') clamp(120px, 10.5vw, 202px) center / auto 100% no-repeat;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-panel {
+    grid-area: panel !important;
+    display: flex;
+    width: auto !important;
+    min-width: 0;
+    min-height: 100%;
+    max-width: none;
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding: clamp(18px, 4vh, 43px) clamp(24px, 8vw, 145px) 34px;
+    background: #f3e9df !important;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-panel::-webkit-scrollbar {
+    display: none;
+    width: 0;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-signup {
+    width: min(100%, 600px) !important;
+    margin: 38px auto 0 !important;
+    text-align: center;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-signup h1 {
+    color: #5a061f;
+    font-family: Georgia, 'Times New Roman', serif !important;
+    font-size: clamp(48px, 4vw, 76px) !important;
+    font-weight: 400;
+    line-height: .95;
+    letter-spacing: -.055em;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-signup .auth-intro {
+    margin: 22px auto 30px;
+    font-family: 'Instrument Sans', Arial, sans-serif;
+    font-size: clamp(9px, .75vw, 12px);
+    letter-spacing: .3em;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-signup-form {
+    width: min(100%, 560px) !important;
+    margin: 0 auto !important;
+    text-align: left;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .skills-helper,
+  .auth-shell:has(.auth-signup.is-active) .looking-helper {
+    color: rgba(90, 6, 31, .68) !important;
+    font-size: 11px;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .signup-step-prev {
+    display: flex !important;
+    min-height: 42px;
+    margin-top: 12px;
+    border: 1px solid rgba(90, 6, 31, .35) !important;
+    background: rgba(255, 250, 241, .3) !important;
+    color: #5a061f !important;
+    font-size: 10px;
+    letter-spacing: .08em;
+  }
+
+  .auth-shell:has(.auth-signup.is-active) .auth-panel::before {
+    display: none !important;
+    right: clamp(14px, 2.5vw, 42px) !important;
+    bottom: 25px;
+    width: 220px;
+    font-family: 'Instrument Sans', Arial, sans-serif !important;
+    font-size: 19px !important;
+    font-style: normal !important;
+    font-weight: 500;
+    line-height: 1.35;
+    content: '\201CMeet your people.\A Build something real.\201D';
+  }
+}

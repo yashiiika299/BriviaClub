@@ -1,12 +1,41 @@
 .intro-burst {
   background: #020304;
-  animation: intro-reference-exit .48s cubic-bezier(.76, 0, .24, 1) 3.05s forwards;
+  animation: intro-reference-exit .68s cubic-bezier(.76, 0, .24, 1) 4.45s forwards;
 }
 
 .intro-burst::after {
   background: radial-gradient(ellipse at 50% 51%, rgba(73, 5, 25, .3), transparent 30%), linear-gradient(180deg, #020304, #010203);
   opacity: 1;
 }
+
+.intro-burst::before {
+  position:absolute;
+  z-index:2;
+  inset:0;
+  content:'';
+  pointer-events:none;
+  opacity:0;
+  background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.95) 0,rgba(255,255,255,.28) 5%,rgba(155,50,27,.08) 18%,transparent 38%);
+  animation:intro-core-flash 4.45s ease forwards;
+}
+
+.intro-particle-field{position:absolute;z-index:1;inset:0;overflow:hidden;pointer-events:none}
+.intro-particle-canvas{display:block;width:100%;height:100%}
+.intro-particle-field span{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:var(--particle-size);
+  height:calc(var(--particle-size) * .42);
+  border-radius:999px;
+  background:#fff;
+  box-shadow:0 0 10px rgba(255,255,255,.72);
+  opacity:0;
+  transform:translate(-50%,-50%) translate(var(--particle-x),var(--particle-y)) rotate(var(--particle-rotation)) scale(.1);
+  animation:intro-particle-gather 3.35s cubic-bezier(.2,.8,.2,1) var(--particle-delay) forwards;
+}
+.intro-particle-field span.is-rose{background:#f3c2cc;box-shadow:0 0 11px rgba(243,194,204,.78)}
+.intro-particle-field span.is-wine{background:#9b321b;box-shadow:0 0 12px rgba(155,50,27,.78)}
 
 .intro-prelude {
   position: absolute;
@@ -56,7 +85,7 @@
   text-shadow: 0 0 7px rgba(255, 255, 255, .8), 0 0 22px rgba(255, 231, 238, .38), 0 0 44px rgba(128, 21, 49, .72);
   opacity: 0;
   transform: translateY(10px) scale(.96);
-  animation: intro-wordmark-reveal .78s cubic-bezier(.2, .8, .2, 1) 1.02s forwards, intro-wordmark-glow 1.8s ease-in-out 1.8s infinite alternate;
+  animation: intro-wordmark-reveal .86s cubic-bezier(.2, .8, .2, 1) 1.22s forwards, intro-wordmark-glow 1.8s ease-in-out 2s infinite alternate;
 }
 
 .glitch-intro-wordmark span { position: relative; display: block; white-space: nowrap; }
@@ -97,6 +126,12 @@
 .glitch-intro-wordmark span::before,
 .glitch-intro-wordmark span::after { display: none; }
 
+.glitch-intro-wordmark.is-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: intro-wordmark-glow 1.8s ease-in-out infinite alternate;
+}
+
 .intro-burst.is-skipped { animation: intro-reference-exit .42s cubic-bezier(.76, 0, .24, 1) forwards; }
 
 @keyframes intro-wordmark-reveal { from { opacity: 0; transform: translateY(10px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -105,12 +140,22 @@
 @keyframes intro-line-reveal { 0% { opacity: 0; transform: translateX(-115%) scaleX(.35) rotate(-7deg); } 16% { opacity: 1; } 78% { opacity: .9; } 100% { opacity: 0; transform: translateX(115%) scaleX(1) rotate(-7deg); } }
 @keyframes intro-line-glow { 0%, 100% { opacity: 0; transform: translateX(-115%) rotate(-7deg); } 28% { opacity: .7; } 78% { opacity: .35; } 100% { transform: translateX(115%) rotate(-7deg); } }
 @keyframes intro-reference-exit { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+@keyframes intro-core-flash { 0%,32%{opacity:0;transform:scale(.2)} 42%{opacity:.95;transform:scale(1)} 54%{opacity:.12;transform:scale(1.35)} 100%{opacity:0;transform:scale(1.8)} }
+@keyframes intro-particle-gather {
+  0%{opacity:0;transform:translate(-50%,-50%) translate(var(--particle-x),var(--particle-y)) rotate(var(--particle-rotation)) scale(.1)}
+  22%{opacity:.25}
+  45%{opacity:.9;transform:translate(-50%,-50%) translate(var(--particle-near-x),var(--particle-near-y)) rotate(var(--particle-rotation)) scale(1)}
+  63%{opacity:.96;transform:translate(-50%,-50%) translate(calc(var(--particle-near-x) * .26),calc(var(--particle-near-y) * .26)) rotate(var(--particle-rotation)) scale(.72)}
+  80%{opacity:.55;transform:translate(-50%,-50%) translate(calc(var(--particle-x) * .72),calc(var(--particle-y) * .72)) rotate(var(--particle-rotation)) scale(.6)}
+  100%{opacity:0;transform:translate(-50%,-50%) translate(var(--particle-x),var(--particle-y)) rotate(var(--particle-rotation)) scale(.12)}
+}
 
 @media (prefers-reduced-motion: reduce) {
   .glitch-intro-wordmark,
   .glitch-intro-wordmark::before,
   .glitch-intro-wordmark::after,
   .intro-prelude { animation: none; }
+  .intro-particle-field span { animation: none; opacity: 0; }
   .glitch-intro-wordmark { opacity: 1; transform: none; }
   .intro-prelude { opacity: 0; }
 }

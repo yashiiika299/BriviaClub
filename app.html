@@ -9,17 +9,18 @@
   </head>
   <body class="app-body app-auth-pending">
     <div class="app-wrap">
-      <header class="app-topbar"><a class="app-brand" href="/"><span class="app-brand-prefix">the</span><strong>Brivia Club</strong></a><button class="app-avatar-button" data-nav="profile" aria-label="Open profile">YU</button></header>
+      <header class="app-topbar"><a class="app-brand" href="/app.html?view=home"><span class="app-brand-prefix">the</span><strong>Brivia Club</strong></a><nav class="app-header-nav" aria-label="Member navigation"><a class="app-nav-button is-active" href="/app.html?view=home" data-nav="home"><span>⌂</span>HOME</a><a class="app-nav-button" href="/app.html?view=explore" data-nav="explore"><span>◎</span>EXPLORE</a><a class="app-nav-button" href="/app.html?view=chat" data-nav="chat"><span>◌</span>CHAT<i id="chat-badge">0</i></a><a class="app-nav-button" href="/app.html?view=profile" data-nav="profile"><span>◉</span>PROFILE</a></nav><button class="app-avatar-button" data-nav="profile" aria-label="Open profile">YU</button></header>
       <main class="app-main">
         <section class="app-view is-active" data-view="home">
-          <div class="view-topline"><span>DISCOVERY / 001</span><span id="queue-count">01 / 06</span></div>
+          <div class="view-topline home-layout-spacer" aria-hidden="true"><span>DISCOVERY / 001</span><span id="queue-count">01 / 06</span></div>
           <div class="home-heading"><p class="app-eyebrow">PEOPLE WORTH KNOWING</p><h1>Meet your<br /><em>kind.</em></h1><p>Swipe with intention. Every yes opens a possibility.</p></div>
           <div class="swipe-card" id="swipe-card">
+            <div class="swipe-card-topline"><span id="swipe-card-label">CREATIVE SOUL</span><b aria-hidden="true">•••</b></div>
             <div class="swipe-card-image"><img id="swipe-image" src="./assets/bala.webp" alt="Member profile" /><div class="swipe-card-shade"></div><span class="member-active"><i></i> ACTIVE</span></div>
             <div class="swipe-card-info"><div class="member-name-row"><h2 id="swipe-name">Bala</h2><span id="swipe-age">24</span><span class="verified-mark">✓</span></div><p id="swipe-role">Product designer</p><p id="swipe-location">Bengaluru, India</p><div class="member-tags" id="swipe-tags"></div><button class="view-info-button" data-action="full-info">VIEW FULL INFO <span>↗</span></button></div>
           </div>
           <div class="swipe-actions"><button class="swipe-action swipe-pass" data-action="pass" aria-label="Pass">×</button><button class="swipe-action swipe-like" data-action="like" aria-label="Connect">✓</button></div>
-          <p class="swipe-hint">CROSS TO PASS <span>·</span> GREEN TICK TO PITCH</p>
+          <p class="swipe-hint">PASS WITH INTENTION <span>·</span> PITCH WITH PURPOSE</p>
         </section>
 
         <section class="app-view" data-view="explore" hidden>
@@ -53,7 +54,6 @@
           <div class="profile-login-card"><div><span>YOUR LOGIN DETAILS</span><strong id="profile-login-email">—</strong></div></div>
         </section>
       </main>
-      <nav class="app-bottom-nav" aria-label="Member navigation"><a class="app-nav-button is-active" href="/app.html?view=home" data-nav="home"><span>⌂</span>HOME</a><a class="app-nav-button" href="/app.html?view=explore" data-nav="explore"><span>◎</span>EXPLORE</a><a class="app-nav-button" href="/app.html?view=chat" data-nav="chat"><span>◌</span>CHAT<i id="chat-badge">0</i></a><a class="app-nav-button" href="/app.html?view=profile" data-nav="profile"><span>◉</span>PROFILE</a></nav>
     </div>
 
     <div class="app-overlay" id="info-modal" hidden><div class="app-overlay-backdrop" data-close-overlay></div><section class="info-panel"><button class="overlay-close" data-close-overlay>×</button><p class="app-eyebrow">FULL INTRODUCTION</p><div class="info-person"><div class="mini-avatar" id="info-avatar">P</div><div><h2 id="info-name">Priya</h2><p id="info-role">Product designer</p></div></div><p id="info-bio">—</p><div class="info-facts" id="info-facts"></div><div class="profile-pills" id="info-tags"></div></section></div>
@@ -65,6 +65,8 @@
         const readView = () => new URLSearchParams(window.location.search).get('view') || window.location.hash.slice(1) || 'home';
         const showView = (view) => {
           if (!validViews.includes(view)) view = 'home';
+          document.body.dataset.appView = view;
+          document.body.classList.toggle('app-subview', view !== 'home');
           document.querySelectorAll('[data-view]').forEach((section) => {
             section.hidden = section.dataset.view !== view;
             section.classList.toggle('is-active', section.dataset.view === view);
@@ -81,7 +83,7 @@
           const nextUrl = new URL(window.location.href);
           if (targetView === 'home') nextUrl.searchParams.delete('view');
           else nextUrl.searchParams.set('view', targetView);
-          window.history.replaceState(
+          window.history.pushState(
             { ...(window.history.state || {}), appView: targetView },
             '',
             nextUrl.pathname + nextUrl.search + nextUrl.hash

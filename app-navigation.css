@@ -1,0 +1,193 @@
+ .app-view[data-view="chat"][hidden]{display:none!important}
+
+body.app-subview .app-wrap{padding-bottom:0}
+body.app-subview .app-view.is-active{min-height:calc(100svh - 94px);padding-bottom:48px}
+
+.app-topbar{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:24px;
+  height:94px;
+}
+.app-brand{min-width:0;white-space:nowrap}
+.app-avatar-button{justify-self:end}
+.app-header-nav{position:absolute;top:50%;left:50%;display:flex;align-items:center;justify-content:center;gap:clamp(18px,3vw,44px);transform:translate(-50%,-50%);white-space:nowrap}
+.app-header-nav .app-nav-button{
+  position:relative;
+  display:flex;
+  min-width:72px;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:3px;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:rgba(90,6,31,.58);
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-decoration:none;
+  transition:background .2s,color .2s,transform .2s;
+}
+.app-header-nav .app-nav-button span{font-size:19px;line-height:20px}
+.app-header-nav .app-nav-button:hover{color:var(--app-violet);transform:translateY(-2px)}
+.app-header-nav .app-nav-button.is-active{color:var(--app-violet)}
+.app-header-nav .app-nav-button.is-active span{color:var(--app-violet)}
+.app-header-nav .app-nav-button i{position:absolute;top:-3px;right:5px;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#b94b67;color:#fffaf1;font-size:8px;font-style:normal}
+
+/* Keep the header navigation identical on every route. */
+body .app-header-nav{
+  gap:5px;
+  padding:5px;
+  border:1px solid rgba(90,6,31,.16);
+  border-radius:999px;
+  background:rgba(255,250,241,.58);
+  box-shadow:0 8px 22px rgba(64,37,30,.08);
+}
+body .app-header-nav .app-nav-button,
+body:not(.app-subview) .app-header-nav .app-nav-button{
+  width:82px;
+  min-width:82px;
+  height:50px;
+  flex:0 0 82px;
+  padding:4px 7px;
+  border-radius:999px;
+  color:rgba(90,6,31,.62);
+  font-size:8px;
+  line-height:1;
+}
+body .app-header-nav .app-nav-button span,
+body:not(.app-subview) .app-header-nav .app-nav-button span{
+  display:grid;
+  width:24px;
+  height:24px;
+  place-items:center;
+  border:1px solid rgba(90,6,31,.45);
+  border-radius:50%;
+  color:inherit;
+  font-size:17px;
+  line-height:1;
+}
+body .app-header-nav .app-nav-button:hover,
+body:not(.app-subview) .app-header-nav .app-nav-button:hover{
+  background:rgba(90,6,31,.08);
+  color:#5a061f;
+  transform:translateY(-1px);
+}
+body .app-header-nav .app-nav-button.is-active,
+body:not(.app-subview) .app-header-nav .app-nav-button.is-active{
+  background:#5a061f;
+  color:#fffaf1;
+  box-shadow:0 6px 14px rgba(90,6,31,.2);
+}
+body .app-header-nav .app-nav-button.is-active span,
+body:not(.app-subview) .app-header-nav .app-nav-button.is-active span{
+  border-color:rgba(255,250,241,.55);
+  color:#fffaf1;
+}
+body .app-header-nav .app-nav-button i,
+body:not(.app-subview) .app-header-nav .app-nav-button i{
+  top:1px;
+  right:10px;
+  width:15px;
+  height:15px;
+  background:#c74d6b;
+  color:#fffaf1;
+}
+
+html{scrollbar-gutter:stable}
+
+body:not(.app-subview) .app-bottom-nav{
+  right:auto;
+  bottom:10px;
+  left:50%;
+  width:min(570px,calc(100% - 32px));
+  height:60px;
+  padding:5px 7px;
+  transform:translateX(-50%);
+  border:1px solid rgba(90,6,31,.2);
+  border-radius:21px;
+  background:rgba(247,239,229,.93);
+  box-shadow:0 14px 35px rgba(64,37,30,.16),0 2px 8px rgba(64,37,30,.08);
+  backdrop-filter:blur(18px);
+}
+
+body:not(.app-subview) .app-nav-button{
+  min-width:0;
+  flex:1;
+  justify-content:center;
+  gap:3px;
+  border-radius:17px;
+  color:rgba(90,6,31,.56);
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:8px;
+  letter-spacing:.14em;
+  transition:background .2s,color .2s,transform .2s;
+}
+
+body:not(.app-subview) .app-nav-button span{
+  display:grid;
+  width:27px;
+  height:25px;
+  place-items:center;
+  border:1px solid transparent;
+  border-radius:50%;
+  font-size:19px;
+  line-height:1;
+}
+
+body:not(.app-subview) .app-nav-button:hover{color:var(--app-violet);transform:translateY(-2px)}
+body:not(.app-subview) .app-nav-button.is-active{background:var(--app-violet);color:#fffaf1;box-shadow:0 6px 14px rgba(90,6,31,.2)}
+body:not(.app-subview) .app-nav-button.is-active span{border-color:rgba(255,250,241,.35)}
+body:not(.app-subview) .app-nav-button i{top:4px;right:calc(50% - 23px);background:#b94b67;color:#fffaf1}
+
+@media(max-width:700px){
+  body.app-subview .app-view.is-active{min-height:calc(100svh - 62px)}
+  .app-topbar{height:62px;gap:8px;padding:0 12px}
+  .app-brand{font-size:13px}
+  .app-header-nav{gap:2px;padding:3px}
+  body .app-header-nav .app-nav-button,
+  body:not(.app-subview) .app-header-nav .app-nav-button{width:42px;min-width:42px;height:48px;flex-basis:42px;padding:3px 2px;font-size:6px;letter-spacing:.04em}
+  body .app-header-nav .app-nav-button span,
+  body:not(.app-subview) .app-header-nav .app-nav-button span{width:20px;height:20px;font-size:14px}
+  body .app-header-nav .app-nav-button i,
+  body:not(.app-subview) .app-header-nav .app-nav-button i{top:0;right:0;width:12px;height:12px;font-size:7px}
+  .app-avatar-button{width:30px;height:30px;font-size:8px}
+}
+
+@media(min-width:701px){
+  body.app-body[data-app-view="chat"]{
+    width:100vw!important;
+    min-width:100vw!important;
+    max-width:none!important;
+    overflow-x:hidden!important;
+  }
+  body.app-body[data-app-view="chat"] .app-view[data-view="chat"].is-active{
+    position:fixed!important;
+    top:94px!important;
+    right:0!important;
+    bottom:0!important;
+    left:0!important;
+    width:100vw!important;
+    height:auto!important;
+    min-height:0!important;
+    max-width:none!important;
+    z-index:100!important;
+    padding:6px!important;
+  }
+  body.app-body[data-app-view="chat"] .app-wrap,
+  body.app-body[data-app-view="chat"] .app-main{
+    width:100vw!important;
+    max-width:none!important;
+    margin:0!important;
+  }
+  body.app-body[data-app-view="chat"] .app-view[data-view="chat"].is-active .chat-layout{
+    flex:1 1 auto!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+  }
+  body.app-body[data-app-view="chat"] .app-view[data-view="chat"].is-active{padding-bottom:6px!important}
+}
